@@ -1,0 +1,37 @@
+<view class="subpage">
+  <view class="subpage-header">
+    <view class="back-btn" bindtap="goBack" hover-class="btn-hover">‹</view>
+    <text class="subpage-title">我的点赞</text>
+    <view class="back-btn" />
+  </view>
+
+  <view class="filter-tabs">
+    <view class="filter-tab {{filterIdx==0?'active':''}}" data-i="0" bindtap="switchFilter">作品</view>
+    <view class="filter-tab {{filterIdx==1?'active':''}}" data-i="1" bindtap="switchFilter">课程</view>
+    <view class="filter-tab {{filterIdx==2?'active':''}}" data-i="2" bindtap="switchFilter">帖子</view>
+  </view>
+
+  <view class="likes-grid" wx:if="{{list.length}}">
+    <view class="like-card" wx:for="{{list}}" wx:key="id">
+      <image class="like-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="like-mask">
+        <text class="like-title">{{item.title}}</text>
+        <view class="like-meta">
+          <text class="like-author">@{{item.author}}</text>
+          <text class="like-time">{{item.time}}</text>
+        </view>
+        <view class="like-actions">
+          <view class="like-action" catchtap="onUnlike" data-id="{{item.id}}">
+            <text>♡ {{item.likes}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>
+    <text class="empty-icon">♡</text>
+    <text class="empty-text">还没有点赞</text>
+    <text class="empty-sub">去「分类」或「商城」看看，喜欢的就点个赞</text>
+  </view>
+</view>

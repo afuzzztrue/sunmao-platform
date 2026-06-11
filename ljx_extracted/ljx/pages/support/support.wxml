@@ -1,0 +1,76 @@
+<view class="subpage">
+  <view class="subpage-header">
+    <view class="back-btn" bindtap="goBack" hover-class="btn-hover">‹</view>
+    <text class="subpage-title">客服中心</text>
+    <view class="back-btn" />
+  </view>
+
+  <view class="hero">
+    <text class="hero-icon">🎧</text>
+    <text class="hero-title">在线客服</text>
+    <text class="hero-desc">工作日 9:00 - 18:00</text>
+    <view class="hero-btn" bindtap="onChat" hover-class="btn-hover">开始在线咨询</view>
+  </view>
+
+  <view class="contact-list">
+    <view class="contact-item" bindtap="copyText" data-text="400-888-1388">
+      <text class="contact-icon">📞</text>
+      <view class="contact-info">
+        <text class="contact-label">客服电话</text>
+        <text class="contact-value">400-888-1388</text>
+      </view>
+      <text class="contact-action">复制</text>
+    </view>
+    <view class="contact-item" bindtap="copyText" data-text="sunmao-support@example.com">
+      <text class="contact-icon">✉️</text>
+      <view class="contact-info">
+        <text class="contact-label">客服邮箱</text>
+        <text class="contact-value">sunmao-support@example.com</text>
+      </view>
+      <text class="contact-action">复制</text>
+    </view>
+    <view class="contact-item" bindtap="copyText" data-text="sunmao_culture">
+      <text class="contact-icon">💬</text>
+      <view class="contact-info">
+        <text class="contact-label">官方微信</text>
+        <text class="contact-value">sunmao_culture</text>
+      </view>
+      <text class="contact-action">复制</text>
+    </view>
+    <view class="contact-item" bindtap="copyText" data-text="sunmao_official">
+      <text class="contact-icon">🌐</text>
+      <view class="contact-info">
+        <text class="contact-label">官方微博</text>
+        <text class="contact-value">@榫卯传承平台官方</text>
+      </view>
+      <text class="contact-action">复制</text>
+    </view>
+  </view>
+
+  <view class="section-title">服务时间</view>
+  <view class="time-card">
+    <view class="time-row"><text class="time-day">周一至周五</text><text class="time-hour">9:00 - 18:00</text></view>
+    <view class="time-row"><text class="time-day">周六</text><text class="time-hour">10:00 - 16:00</text></view>
+    <view class="time-row"><text class="time-day">周日及法定节假日</text><text class="time-hour">休息</text></view>
+  </view>
+
+  <view class="section-title">常见入口</view>
+  <view class="quick-grid">
+    <view class="quick-item" bindtap="goHelp">
+      <text class="quick-icon">❓</text>
+      <text class="quick-label">常见问题</text>
+    </view>
+    <view class="quick-item" bindtap="onComplain">
+      <text class="quick-icon">📝</text>
+      <text class="quick-label">我要投诉</text>
+    </view>
+    <view class="quick-item" bindtap="onReport">
+      <text class="quick-icon">⚠️</text>
+      <text class="quick-label">举报</text>
+    </view>
+    <view class="quick-item" bindtap="onSuggestion">
+      <text class="quick-icon">💡</text>
+      <text class="quick-label">提建议</text>
+    </view>
+  </view>
+</view>

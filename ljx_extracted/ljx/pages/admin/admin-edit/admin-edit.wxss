@@ -1,0 +1,63 @@
+.edit-container {
+  padding: 28rpx;
+  background: #F5F0E8;
+  min-height: 100vh;
+}
+
+.form-card {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 8rpx 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(62,39,35,0.06);
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid #F0EDE6;
+}
+
+.form-item-last {
+  border-bottom: none;
+}
+
+.form-label {
+  width: 150rpx;
+  font-size: 28rpx;
+  color: #6B5E55;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.form-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  text-align: right;
+}
+
+.form-input[disabled] {
+  color: #9B8E85;
+}
+
+.form-picker {
+  flex: 1;
+  font-size: 28rpx;
+  color: #3E2723;
+  text-align: right;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #3E2723, #5D4037);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: bold;
+  border-radius: 9999rpx;
+  margin-top: 48rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(62,39,35,0.15);
+}

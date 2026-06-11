@@ -1,0 +1,27 @@
+<view class="container">
+  <view class="cover-wrap">
+    <image class="cover" src="{{product.coverImage || '/pages/images/furniture.jpg'}}" mode="aspectFill" />
+  </view>
+
+  <view class="detail-card">
+    <view class="name-row">
+      <text class="name">{{product.productName || '木艺精品'}}</text>
+    </view>
+
+    <view class="price-block">
+      <text class="price-symbol">¥</text>
+      <text class="price-value">{{product.price || '0'}}</text>
+    </view>
+
+    <view class="stock-badge {{product.stock < 10 ? 'low' : ''}}">
+      <text>库存 {{product.stock || 0}} 件</text>
+    </view>
+
+    <view class="divider"></view>
+
+    <view class="desc-label">作品详情</view>
+    <text class="desc">{{product.description || '暂无描述'}}</text>
+  </view>
+
+  <button class="btn-buy" bindtap="doBuy">立即购买</button>
+</view>

@@ -1,0 +1,43 @@
+<view class="subpage">
+  <view class="subpage-header">
+    <view class="back-btn" bindtap="goBack" hover-class="btn-hover">‹</view>
+    <text class="subpage-title">已下载的课程</text>
+    <view class="manage-btn" bindtap="toggleManage" hover-class="btn-hover">{{manageMode ? '完成' : '管理'}}</view>
+  </view>
+
+  <view class="summary-bar">
+    <text class="summary-text">已下载 <text class="summary-num">{{list.length}}</text> 门课程，占用空间 <text class="summary-num">{{totalSize}}MB</text></text>
+  </view>
+
+  <view class="course-list" wx:if="{{list.length}}">
+    <view class="course-card" wx:for="{{list}}" wx:key="id">
+      <image class="course-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="course-info">
+        <text class="course-title">{{item.title}}</text>
+        <text class="course-author">{{item.author}} · {{item.chapters}}课时</text>
+        <view class="progress-wrap">
+          <view class="progress-bar"><view class="progress-fill" style="width:{{item.progress}}%"></view></view>
+          <text class="progress-text">已学 {{item.progress}}%</text>
+        </view>
+        <view class="course-actions">
+          <view class="course-btn btn-primary" catchtap="onContinue" data-id="{{item.id}}">继续学习</view>
+          <view class="course-btn btn-ghost" catchtap="onDetail" data-id="{{item.id}}">查看</view>
+        </view>
+      </view>
+      <view wx:if="{{manageMode}}" class="course-checkbox {{item.selected ? 'checked' : ''}}" catchtap="onSelect" data-id="{{item.id}}">
+        <text wx:if="{{item.selected}}">✓</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>
+    <text class="empty-icon">📚</text>
+    <text class="empty-text">还没有下载的课程</text>
+    <text class="empty-sub">去「商城 → 课程」下载感兴趣的榫卯教程</text>
+  </view>
+
+  <view wx:if="{{manageMode && list.length}}" class="manage-bar">
+    <text class="manage-info">已选 <text class="manage-info-num">{{selectedCount}}</text> 项</text>
+    <view class="manage-btn-bar" bindtap="onDelete" hover-class="btn-hover">删除</view>
+  </view>
+</view>

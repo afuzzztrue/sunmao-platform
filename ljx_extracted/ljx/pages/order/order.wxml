@@ -1,0 +1,58 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">我的订单</text>
+  </view>
+
+  <view class="sticky-header">
+    <view class="search-bar" bindtap="goToOrderSearch">
+      <view class="search-input search-input-readonly">
+        <text class="search-icon">🔍</text>
+        <text class="search-placeholder">搜索我的订单</text>
+      </view>
+    </view>
+
+    <scroll-view scroll-x class="category-scroll" enable-flex>
+      <view class="cat-scroll-inner">
+        <view
+          wx:for="{{categories}}"
+          wx:key="id"
+          class="cat-item {{currentCat == item.id ? 'active' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="switchCat"
+        >{{item.name}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="order-list" wx:if="{{orderList.length}}">
+    <view
+      id="order-{{item.orderId}}"
+      class="order-card {{item.orderId == highlightOrderId ? 'highlight' : ''}}"
+      wx:for="{{orderList}}"
+      wx:key="orderId"
+    >
+      <view class="card-top">
+        <text class="order-name">{{item.productName}}</text>
+        <view class="qty-badge">
+          <text>×{{item.quantity}}</text>
+        </view>
+      </view>
+      <text class="order-price">¥{{item.totalPrice}}</text>
+      <view class="card-bottom">
+        <text class="order-status status-{{item.status}}">{{statusMap[item.status] || '待支付'}}</text>
+        <text class="order-time">{{item.createTime}}</text>
+      </view>
+      <view class="order-actions" wx:if="{{item.status == 0 || item._canDelete}}">
+        <view class="btn-pay" wx:if="{{item.status == 0}}" catchtap="goPay" data-id="{{item.orderId}}" data-name="{{item.productName}}" data-price="{{item.totalPrice}}">去支付</view>
+        <view class="btn-cancel" wx:if="{{item.status == 0}}" catchtap="cancelOrder" data-id="{{item.orderId}}">取消订单</view>
+        <view class="btn-delete" wx:if="{{item._canDelete}}" catchtap="deleteOrder" data-id="{{item.orderId}}">删除订单</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <image class="empty-icon" src="/pages/images/empty-box.png" mode="aspectFit" />
+    <text class="empty-text">{{emptyMap[currentCat] || '暂无订单'}}</text>
+    <text class="empty-sub">快去挑选心仪的木艺作品吧</text>
+  </view>
+</view>

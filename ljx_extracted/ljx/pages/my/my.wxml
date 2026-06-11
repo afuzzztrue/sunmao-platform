@@ -1,0 +1,122 @@
+<!--pages/my/my.wxml-->
+<view>
+  <view class="profile-header">
+    <view class="profile-content" bindtap="goToLogin">
+      <image class="avatar" src="{{isLogin ? '../images/kk.png' : '../images/kk.png'}}" />
+      <view class="profile-text">
+        <text class="username">{{isLogin ? (userInfo.nickname || '用户' + userInfo.userId) : '未登录'}}</text>
+        <text
+          class="subtitle {{isLogin ? 'subtitle-tappable' : ''}}"
+          hover-class="{{isLogin ? 'subtitle-hover' : ''}}"
+          hover-stay-time="80"
+          catchtap="handleSubtitleTap"
+        >{{isLogin ? '点击对应按钮即可退出登录' : '点击登录'}}</text>
+      </view>
+    </view>
+    <view class="header-icons">
+      <image class="icon" src="../images/set.png" bindtap="goToSettings" hover-class="icon-hover" />
+      <image class="icon" src="../images/saearch.png" bindtap="goToGlobalSearch" hover-class="icon-hover" />
+    </view>
+  </view>
+
+  <view class="stats-card">
+    <view class="stat-item">
+      <text class="stat-label">{{followCount}}</text>
+      <text class="stat-num">关注</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-label">{{followerCount}}</text>
+      <text class="stat-num">粉丝</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-label">1000</text>
+      <text class="stat-num">学习时间</text>
+    </view>
+  </view>
+
+  <view class="menu-card menu-card-first">
+    <view class="menu-item" bindtap="goToFootprint" hover-class="menu-item-hover" hover-stay-time="80">
+      <view class="menu-left">
+        <image class="menu-icon" src="../images/足迹.png" />
+        <text class="menu-text">我的足迹</text>
+      </view>
+      <image class="menu-arrow" src="../images/向右箭头.png" />
+    </view>
+    <view class="menu-item" bindtap="goToWorks" hover-class="menu-item-hover" hover-stay-time="80">
+      <view class="menu-left">
+        <image class="menu-icon" src="../images/我的作品.png" />
+        <text class="menu-text">我的作品</text>
+      </view>
+      <image class="menu-arrow" src="../images/向右箭头.png" />
+    </view>
+    <view class="menu-item" bindtap="goToDownloads" hover-class="menu-item-hover" hover-stay-time="80">
+      <view class="menu-left">
+        <image class="menu-icon" src="../images/下载.png" />
+        <text class="menu-text">已下载的课程</text>
+      </view>
+      <image class="menu-arrow" src="../images/向右箭头.png" />
+    </view>
+    <view class="menu-item" bindtap="goToLikes" hover-class="menu-item-hover" hover-stay-time="80">
+      <view class="menu-left">
+        <image class="menu-icon" src="../images/点赞.png" />
+        <text class="menu-text">我的点赞</text>
+      </view>
+      <image class="menu-arrow" src="../images/向右箭头.png" />
+    </view>
+  </view>
+
+  <view class="menu-card">
+    <view class="menu-item" bindtap="goToHelp" hover-class="menu-item-hover" hover-stay-time="80">
+      <view class="menu-left">
+        <image class="menu-icon" src="../images/帮助与反馈.png" />
+        <text class="menu-text">帮助与反馈</text>
+      </view>
+      <image class="menu-arrow" src="../images/向右箭头.png" />
+    </view>
+    <view class="menu-item" bindtap="goToSupport" hover-class="menu-item-hover" hover-stay-time="80">
+      <view class="menu-left">
+        <image class="menu-icon" src="../images/客服.png" />
+        <text class="menu-text">客服中心</text>
+      </view>
+      <image class="menu-arrow" src="../images/向右箭头.png" />
+    </view>
+  </view>
+
+  <view class="menu-card" bindtap="goToChat">
+    <view class="menu-item">
+      <view class="menu-left">
+        <image class="menu-icon" src="../images/structure-1.png" />
+        <text class="menu-text">AI文化导师</text>
+      </view>
+      <image class="menu-arrow" src="../images/向右箭头.png" />
+    </view>
+  </view>
+
+  <view wx:if="{{isLogin && userType == 2}}" class="menu-card" bindtap="goToAdmin">
+    <view class="menu-item menu-item-accent">
+      <view class="menu-left">
+        <image class="menu-icon" src="../images/structure-2.png" />
+        <text class="menu-text">用户管理</text>
+      </view>
+      <image class="menu-arrow" src="../images/向右箭头.png" />
+    </view>
+  </view>
+
+  <view wx:if="{{isLogin}}" class="menu-card" bindtap="goToOrders">
+    <view class="menu-item menu-item-accent">
+      <view class="menu-left">
+        <image class="menu-icon" src="../images/structure-3.png" />
+        <text class="menu-text">我的订单</text>
+      </view>
+      <image class="menu-arrow" src="../images/向右箭头.png" />
+    </view>
+  </view>
+
+  <view wx:if="{{isLogin}}" class="logout-section">
+    <button id="logout-btn" class="btn-logout {{logoutFlash ? 'flash' : ''}}" bindtap="logout">退出登录</button>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>

@@ -1,0 +1,146 @@
+.admin-container {
+  padding: 24rpx;
+  background: #F5F0E8;
+  min-height: 100vh;
+  padding-bottom: 140rpx;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 28rpx;
+}
+
+.search-input {
+  flex: 1;
+  height: 76rpx;
+  background: #FFFFFF;
+  border-radius: 9999rpx;
+  padding: 0 28rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  border: 2rpx solid #3E2723;
+}
+
+.search-btn {
+  height: 76rpx;
+  padding: 0 32rpx;
+  background: #D4A45A;
+  color: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: bold;
+  border-radius: 9999rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-card {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2rpx 8rpx rgba(62,39,35,0.06);
+}
+
+.user-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.user-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 6rpx;
+}
+
+.user-detail {
+  font-size: 24rpx;
+  color: #6B5E55;
+  display: block;
+  line-height: 1.6;
+}
+
+.user-type-badge {
+  display: inline-block;
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 9999rpx;
+  margin-top: 8rpx;
+  font-weight: bold;
+}
+
+.badge-admin {
+  background: rgba(196,73,61,0.12);
+  color: #C4493D;
+}
+
+.badge-heritor {
+  background: rgba(212,164,90,0.15);
+  color: #D4A45A;
+}
+
+.badge-normal {
+  background: rgba(125,154,106,0.12);
+  color: #7D9A6A;
+}
+
+.user-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  flex-shrink: 0;
+  margin-left: 20rpx;
+}
+
+.btn-edit {
+  background: transparent;
+  color: #3E2723;
+  font-size: 24rpx;
+  border: 2rpx solid #3E2723;
+  border-radius: 9999rpx;
+  padding: 8rpx 24rpx;
+}
+
+.btn-delete {
+  background: transparent;
+  color: #C4493D;
+  font-size: 24rpx;
+  border-radius: 9999rpx;
+  padding: 8rpx 24rpx;
+}
+
+.empty {
+  text-align: center;
+  color: #9B8E85;
+  font-size: 28rpx;
+  padding: 120rpx 0;
+}
+
+.add-fab {
+  position: fixed;
+  bottom: 60rpx;
+  right: 40rpx;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 9999rpx;
+  background: linear-gradient(135deg, #3E2723, #5D4037);
+  box-shadow: 0 8rpx 24rpx rgba(62,39,35,0.30);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.add-icon {
+  font-size: 48rpx;
+  color: #D4A45A;
+  font-weight: 300;
+  line-height: 1;
+}

@@ -1,0 +1,253 @@
+/* pages/sort/sort.wxss — 榫卯结构图鉴 */
+
+page {
+  background-color: var(--color-bg);
+}
+
+/* ===== 顶部标题 ===== */
+.header {
+  padding: 44rpx 30rpx 30rpx;
+  background: linear-gradient(180deg, #3E2723 0%, #4E342E 100%);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.header-icon {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.header-title {
+  font-size: 38rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+  letter-spacing: 3rpx;
+}
+
+/* ===== 二级标签（难度分级） ===== */
+.tabs-scroll {
+  display: flex;
+  justify-content: center;
+  gap: 20rpx;
+  padding: 28rpx 30rpx 16rpx;
+  background: var(--color-bg);
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 18rpx 0;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-round);
+  border: 2rpx solid var(--color-border);
+  transition: all 0.25s ease;
+}
+
+.tab-item.active {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2rpx);
+}
+
+/* ===== 图片网格 ===== */
+.grid-area {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8rpx 22rpx 48rpx;
+  justify-content: space-between;
+}
+
+.card {
+  width: calc(50% - 10rpx);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 22rpx;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease;
+}
+
+.card:active {
+  transform: scale(0.96);
+}
+
+.card-img {
+  width: 100%;
+  height: 300rpx;
+  display: block;
+  background: #F5F0E8;
+}
+
+.card-body {
+  padding: 18rpx 16rpx 22rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.card-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+.card-badge {
+  align-self: flex-start;
+  padding: 4rpx 18rpx;
+  border-radius: var(--radius-sm);
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.badge-beginner {
+  background: rgba(125, 154, 106, 0.14);
+  color: #5B8A4A;
+}
+
+.badge-scholar {
+  background: rgba(212, 164, 90, 0.14);
+  color: #B8860B;
+}
+
+.badge-master {
+  background: rgba(196, 73, 61, 0.12);
+  color: #C4493D;
+}
+
+/* ===== 详情弹窗 ===== */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.overlay-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.detail-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-height: 85vh;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow-y: auto;
+  animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.detail-close {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  z-index: 10;
+  width: 56rpx;
+  height: 56rpx;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-icon {
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.detail-img {
+  width: 100%;
+  height: 420rpx;
+  background: #F5F0E8;
+}
+
+.detail-body {
+  padding: 28rpx 30rpx 48rpx;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex-wrap: wrap;
+}
+
+.detail-name {
+  font-size: 38rpx;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.detail-badge {
+  padding: 6rpx 20rpx;
+  border-radius: var(--radius-sm);
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.detail-divider {
+  height: 1rpx;
+  background: var(--color-border);
+  margin: 24rpx 0;
+}
+
+.detail-label {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  display: block;
+  margin-bottom: 16rpx;
+  padding-left: 12rpx;
+  border-left: 5rpx solid var(--color-accent);
+}
+
+.detail-desc {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.85;
+  text-align: justify;
+  display: block;
+}
+
+.btn-shop {
+  margin-top: 40rpx;
+  width: 100%;
+  background: linear-gradient(135deg, var(--color-accent), #E8C96A);
+  color: var(--color-text);
+  border-radius: var(--radius-round);
+  padding: 26rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 4rpx 14rpx rgba(212, 164, 90, 0.35);
+}

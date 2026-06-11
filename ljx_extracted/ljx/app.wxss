@@ -1,0 +1,194 @@
+/* app.wxss - 榫卯匠心 全局主题样式 */
+
+/* ===== CSS 变量主题系统 ===== */
+page {
+  --color-primary: #3E2723;
+  --color-primary-light: #5D4037;
+  --color-accent: #D4A45A;
+  --color-accent-light: #F0D89A;
+  --color-bg: #F5F0E8;
+  --color-bg-card: #FFFFFF;
+  --color-bg-surface: #FAF7F2;
+  --color-text: #1A1A1A;
+  --color-text-secondary: #6B5E55;
+  --color-text-muted: #9B8E85;
+  --color-border: rgba(62, 39, 35, 0.08);
+  --color-border-active: rgba(62, 39, 35, 0.18);
+  --color-highlight: #C4493D;
+  --color-success: #7D9A6A;
+  --color-warn: #E8A838;
+  --shadow-sm: 0 2rpx 8rpx rgba(62, 39, 35, 0.06);
+  --shadow-md: 0 4rpx 16rpx rgba(62, 39, 35, 0.10);
+  --shadow-lg: 0 8rpx 32rpx rgba(62, 39, 35, 0.14);
+  --radius-sm: 12rpx;
+  --radius-md: 20rpx;
+  --radius-lg: 28rpx;
+  --radius-round: 9999rpx;
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 32rpx;
+  --spacing-xl: 48rpx;
+  --font-xs: 22rpx;
+  --font-sm: 26rpx;
+  --font-md: 30rpx;
+  --font-lg: 36rpx;
+  --font-xl: 44rpx;
+  --font-xxl: 56rpx;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: var(--font-md);
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+/* ===== 通用布局 ===== */
+.page-container {
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.section-card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
+  margin: 0 var(--spacing-md) var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg) var(--spacing-md) var(--spacing-sm);
+}
+
+.section-title {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  position: relative;
+  padding-left: var(--spacing-sm);
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4rpx;
+  bottom: 4rpx;
+  width: 6rpx;
+  background: linear-gradient(180deg, var(--color-accent), var(--color-highlight));
+  border-radius: var(--radius-sm);
+}
+
+.section-more {
+  display: flex;
+  align-items: center;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.section-more::after {
+  content: '';
+  width: 24rpx;
+  height: 24rpx;
+  margin-left: 6rpx;
+  border-right: 2rpx solid var(--color-text-muted);
+  border-bottom: 2rpx solid var(--color-text-muted);
+  transform: rotate(-45deg);
+}
+
+/* ===== 通用搜索框 ===== */
+.search-input {
+  background: var(--color-bg-surface);
+  height: 76rpx;
+  border-radius: var(--radius-round);
+  padding: 0 36rpx;
+  font-size: var(--font-md);
+  border: 2rpx solid var(--color-border);
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  border-color: var(--color-accent);
+  background: var(--color-bg-card);
+}
+
+/* ===== 通用标签 ===== */
+.tag-primary {
+  background: rgba(212, 164, 90, 0.12);
+  color: var(--color-accent);
+  padding: 6rpx 18rpx;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-xs);
+  font-weight: 600;
+}
+
+.tag-accent {
+  background: rgba(196, 73, 61, 0.10);
+  color: var(--color-highlight);
+  padding: 6rpx 18rpx;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-xs);
+  font-weight: 600;
+}
+
+/* ===== 通用按钮 ===== */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: #FFFFFF;
+  border-radius: var(--radius-round);
+  padding: 28rpx;
+  font-size: var(--font-md);
+  font-weight: 600;
+  border: none;
+  letter-spacing: 2rpx;
+}
+
+.btn-accent {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
+  color: var(--color-text);
+  border-radius: var(--radius-round);
+  padding: 24rpx;
+  font-size: var(--font-md);
+  font-weight: 600;
+  border: none;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2rpx solid var(--color-primary);
+  border-radius: var(--radius-round);
+  padding: 20rpx;
+  font-size: var(--font-sm);
+}
+
+/* ===== 加载态 ===== */
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  margin: 100rpx auto;
+  border: 4rpx solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 0;
+}
+
+.empty-state text {
+  font-size: var(--font-md);
+  color: var(--color-text-muted);
+}

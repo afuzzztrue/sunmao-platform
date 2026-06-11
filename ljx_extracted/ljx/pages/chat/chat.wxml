@@ -1,0 +1,34 @@
+<view class="chat-container">
+  <scroll-view class="chat-list" scroll-y scroll-into-view="{{scrollToView}}" scroll-with-animation>
+    <block wx:for="{{messages}}" wx:key="index">
+      <view id="msg-{{index}}">
+        <view wx:if="{{item.role == 'user'}}" class="msg-row-user">
+          <view class="msg-bubble msg-bubble-user">{{item.content}}</view>
+        </view>
+        <view wx:else class="msg-row-ai">
+          <view class="msg-avatar">
+            <text class="avatar-icon">AI</text>
+          </view>
+          <view class="msg-bubble msg-bubble-ai">{{item.content}}</view>
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{loading}}" class="msg-row-ai">
+      <view class="msg-avatar">
+        <text class="avatar-icon">AI</text>
+      </view>
+      <view class="msg-bubble msg-bubble-ai loading-bubble">
+        <view class="loading-dots">
+          <view class="dot"></view>
+          <view class="dot"></view>
+          <view class="dot"></view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="input-bar">
+    <input class="input-field" placeholder="请问关于榘卯的问题..." value="{{inputValue}}" bindinput="onInput" confirm-type="send" bindconfirm="sendMsg" />
+    <button class="send-btn" bindtap="sendMsg" disabled="{{loading}}">发送</button>
+  </view>
+</view>

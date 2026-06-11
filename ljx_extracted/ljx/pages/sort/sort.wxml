@@ -1,0 +1,60 @@
+<view class="page-wrapper">
+  <view class="header">
+    <view class="header-left">
+      <image src="../images/sort-title.png" class="header-icon" mode="aspectFit"/>
+      <text class="header-title">榫卯结构图鉴</text>
+    </view>
+  </view>
+
+  <view class="tabs-scroll">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="id"
+      class="tab-item {{currentTabId == item.id ? 'active' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="switchTab"
+    >{{item.name}}</view>
+  </view>
+
+  <view class="grid-area">
+    <view
+      wx:for="{{structureList}}"
+      wx:key="id"
+      class="card"
+      data-id="{{item.id}}"
+      bindtap="openDetail"
+    >
+      <image class="card-img" src="{{item.image}}" mode="aspectFill"/>
+      <view class="card-body">
+        <text class="card-name">{{item.name}}</text>
+        <view class="card-badge badge-{{item.difficulty}}">{{item.difficultyLabel}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showDetail}}" class="overlay" bindtap="closeDetail">
+    <view class="overlay-bg"></view>
+    <view class="detail-card" catchtap="">
+      <view class="detail-close" bindtap="closeDetail">
+        <text class="close-icon">✕</text>
+      </view>
+
+      <image class="detail-img" src="{{detailItem.image}}" mode="aspectFit"/>
+
+      <view class="detail-body">
+        <view class="detail-header">
+          <text class="detail-name">{{detailItem.name}}</text>
+          <view class="detail-badge badge-{{detailItem.difficulty}}">{{detailItem.difficultyLabel}}</view>
+        </view>
+
+        <view class="detail-divider"></view>
+        <text class="detail-label">结构详解</text>
+        <text class="detail-desc">{{detailItem.description}}</text>
+
+        <button class="btn-shop" bindtap="goToShopSearch">
+          <text>🔍 在商城搜索「{{detailItem.searchKeyword}}」相关商品</text>
+        </button>
+      </view>
+    </view>
+  </view>
+</view>

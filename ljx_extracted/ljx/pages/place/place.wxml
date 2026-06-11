@@ -1,0 +1,44 @@
+<!--pages/place/place.wxml-->
+<view>
+  <!-- 搜索框 -->
+  <view class="search-bar">
+    <image class="search-icon" src="../images/saearch.png" />
+    <input class="search-input" placeholder="搜索榫卯结构" />
+  </view>
+
+  <!-- 分类标签 -->
+  <scroll-view scroll-x class="category-scroll">
+    <view class="category-list">
+      <view wx:for="{{categories}}" wx:key="index" class="category-item {{currentIndex==index?'active':''}}" data-index="{{index}}" bindtap="switchCategory">{{item.name}}</view>
+    </view>
+  </scroll-view>
+
+  <!-- 主题内容 -->
+   <view class="content-card">
+    <view class="user-info">
+      <image class="avatar" src="../images/kk.png" />
+      <view class="user-detail">
+        <text class="username">非遗传承人·王师傅</text>
+        <text class="personal">2小时前·北京</text>
+      </view>
+    </view>
+    <view class="card-body">
+      <text class="card-desc">今天在市集现场展示了传统榫卯结构的制作技艺，吸引了很多年轻人围观学习。传承需要创新，榫卯精神永流传!</text>
+      <image src="../images/大师.png" mode="aspectFill" class="card-img"/>
+      <view class="actions">
+        <view class="action-item" bindtap="toggleLike">
+          <image class="action-icon" src="{{liked ? '../images/点赞-1.png' : '../images/点赞-0.png'}}" />
+          <text class="action-text">点赞</text>
+        </view>
+        <view class="action-item">
+          <image class="action-icon" src="../images/评论.png" />
+          <text class="action-text">评论</text>
+        </view>
+        <view class="action-item">
+          <image class="action-icon" src="../images/分享.png" />
+          <text class="action-text">分享</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

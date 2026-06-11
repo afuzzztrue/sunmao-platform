@@ -1,0 +1,95 @@
+📋 你需要在电脑上逐步执行的操作
+═══ 第一步：在 DBeaver 执行建库建表 ═══
+打开 DBeaver，连接 MySQL 8.0 (3307端口)，确认能连上
+打开文件：ljx_backend/sql/init_database.sql
+全选 → 执行（Ctrl+A → Ctrl+Enter）
+验证：展开 ljx_platform 库，检查是否有 16 张表
+═══ 第二步：确认 MySQL 8.0 服务已启动 ═══
+
+PowerShell
+
+Get-Service -Name "MySQL80" | Select-Object Name, Status, StartType
+如果 Status 不是 Running，去 services.msc 手动启动 MySQL80。
+
+═══ 第三步：在 IDEA 编译启动后端 ═══
+⚠️ 前提：IDEA 必须配置 JDK 1.8（不是 JRE），File → Project Structure → SDK 选择 JDK 1.8
+
+用 IDEA 打开 ljx_backend 项目
+点击右侧 Maven → 双击 clean → 双击 compile
+运行 com.sunmao.ljx.LjxApplication 的 main 方法
+观察控制台输出，确认没有报错，最后显示类似：
+
+Plain Text
+
+Tomcat started on port(s): 8081
+═══ 第四步：验证后端健康状态 ═══
+浏览器访问：
+
+
+Plain Text
+
+http://localhost:8081/api/user/login
+如果返回 JSON 错误（参数缺失）而不是 404/连接失败，说明后端启动成功。
+
+═══ 第五步：小程序注册用户 ═══
+微信开发者工具打开 ljx_extracted/ljx
+确保 [app.js] 中 baseUrl 指向 http://localhost:8081
+编译运行 → 进入"我的"Tab → 点击注册
+用手机号注册，例如：
+账号：13812345678
+密码：123456
+昵称：任意
+注册成功后，注册一个新用户，例如：
+账号：admin@sunmao.com（带@的是邮箱）
+密码：123456
+昵称：管理员
+═══ 第六步：设置管理员账号 ═══
+回到 DBeaver，执行：
+
+
+SQL
+
+-- 先查看刚注册的用户
+SELECT user_id, nickname, phone, email, user_type, create_time FROM user ORDER BY user_id;
+
+-- 假设第一个用户 user_id = 1，将其设为管理员
+UPDATE user SET user_type = 2 WHERE user_id = 1;
+
+-- 如果有第二个管理员账号
+UPDATE user SET user_type = 2 WHERE user_id = 2;
+⚠️ 这次一定能查到数据——因为你刚刚在3307端口的数据库中注册了用户，而之前查3306端口的老库当然是空的。
+
+═══ 第七步：验证管理员功能 ═══
+小程序登录管理员账号
+进入"我的"Tab → 应该能看到 「用户管理」 菜单入口
+点击进入 → 可以看到用户列表、搜索、编辑、添加功能
+═══ 第八步（可选）：配置 DeepSeek API Key ═══
+在 application.yml 中把 your-deepseek-api-key 替换为你的真实 Key，然后重启后端。
+
+⚠️ 风险提示
+风险	说明
+项目使用 Druid 连接池 而非 JNDI+Tomcat	这是 Spring Boot 的标准做法，不需要改，直接 IDEA 启动即可
+IDEA 必须配有 JDK 1.8	只有 JRE 会报 No compiler is provided 错误
+旧数据库（3306端口）数据已废弃	所有新数据都将写入3307端口的MySQL 8.0
+密码使用 MD5 加密	这是项目原作者的实现，非最佳安全实践但保持兼容
+📊 当前项目完整表结构（16张表）
+
+Plain Text
+
+ljx_platform
+├── user              ← 用户表（注册/登录/管理员）
+├── category          ← 内容分类（结构/家具/木料/历史/教程）
+├── article           ← 内容文章（热门/轮播/分类内容）
+├── post              ← 动态帖子
+├── like_record       ← 点赞记录
+├── comment           ← 评论
+├── collect_record    ← 收藏记录
+├── follow            ← 关注关系
+├── footprint         ← 浏览足迹
+├── course            ← 教程课程
+├── course_download   ← 课程下载记录
+├── user_work         ← 用户作品
+├── banner            ← 轮播图
+├── sys_config        ← 系统配置
+├── product           ← ★ 商城商品（新增）
+└── product_order     ← ★ 商城订单（新增）

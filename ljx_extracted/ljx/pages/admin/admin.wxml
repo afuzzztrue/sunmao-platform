@@ -1,0 +1,30 @@
+<view class="admin-container">
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索昵称 / 手机 / 邮箱" bindinput="onSearchInput" value="{{keyword}}" />
+    <button class="search-btn" bindtap="doSearch" size="mini">搜索</button>
+  </view>
+
+  <view class="user-list">
+    <view class="user-card" wx:for="{{userList}}" wx:key="userId">
+      <view class="user-info">
+        <text class="user-name">{{item.nickname || '未命名'}}</text>
+        <text class="user-detail">手机：{{item.phone || '-'}}</text>
+        <text class="user-detail">邮箱：{{item.email || '-'}}</text>
+        <view>
+          <text wx:if="{{item.userType == 2}}" class="user-type-badge badge-admin">管理员</text>
+          <text wx:elif="{{item.userType == 1}}" class="user-type-badge badge-heritor">传承人</text>
+          <text wx:else class="user-type-badge badge-normal">普通用户</text>
+        </view>
+      </view>
+      <view class="user-actions">
+        <button class="btn-edit" size="mini" bindtap="goEdit" data-user="{{item}}">编辑</button>
+        <button class="btn-delete" size="mini" bindtap="doDelete" data-id="{{item.userId}}">删除</button>
+      </view>
+    </view>
+    <view wx:if="{{!userList.length}}" class="empty">暂无用户数据</view>
+  </view>
+
+  <view class="add-fab" bindtap="goAdd">
+    <text class="add-icon">+</text>
+  </view>
+</view>

@@ -1,0 +1,76 @@
+<view class="subpage">
+  <view class="subpage-header">
+    <view class="back-btn" bindtap="goBack" hover-class="btn-hover">‹</view>
+    <text class="subpage-title">设置</text>
+    <view class="back-btn" />
+  </view>
+
+  <view class="user-card" bindtap="onEditProfile">
+    <image class="user-avatar" src="../images/kk.png" />
+    <view class="user-info">
+      <text class="user-name">{{userInfo.nickname || '未登录'}}</text>
+      <text class="user-id">账号 ID: {{userInfo.userId || '-'}}</text>
+    </view>
+    <text class="user-edit">编辑 ›</text>
+  </view>
+
+  <view class="section-title">偏好设置</view>
+  <view class="setting-list">
+    <view class="setting-item">
+      <text class="setting-text">消息通知</text>
+      <switch checked="{{notify}}" bindchange="onToggleNotify" color="#D4A45A" />
+    </view>
+    <view class="setting-item">
+      <text class="setting-text">深色模式</text>
+      <switch checked="{{darkMode}}" bindchange="onToggleDark" color="#D4A45A" />
+    </view>
+    <view class="setting-item" bindtap="onPickFont">
+      <text class="setting-text">字体大小</text>
+      <text class="setting-value">{{fontSizeLabel}}</text>
+    </view>
+    <view class="setting-item" bindtap="onPickLang">
+      <text class="setting-text">语言</text>
+      <text class="setting-value">简体中文</text>
+    </view>
+  </view>
+
+  <view class="section-title">账户与安全</view>
+  <view class="setting-list">
+    <view class="setting-item" bindtap="onChangePwd">
+      <text class="setting-text">修改密码</text>
+      <text class="setting-arrow">›</text>
+    </view>
+    <view class="setting-item" bindtap="onBindPhone">
+      <text class="setting-text">绑定手机</text>
+      <text class="setting-value">{{phone || '未绑定'}}</text>
+    </view>
+    <view class="setting-item" bindtap="onBindEmail">
+      <text class="setting-text">绑定邮箱</text>
+      <text class="setting-value">{{email || '未绑定'}}</text>
+    </view>
+    <view class="setting-item" bindtap="onClearCache">
+      <text class="setting-text">清除缓存</text>
+      <text class="setting-value">{{cacheSize}}</text>
+    </view>
+  </view>
+
+  <view class="section-title">其他</view>
+  <view class="setting-list">
+    <view class="setting-item" bindtap="onPrivacy">
+      <text class="setting-text">隐私政策</text>
+      <text class="setting-arrow">›</text>
+    </view>
+    <view class="setting-item" bindtap="onAgreement">
+      <text class="setting-text">用户协议</text>
+      <text class="setting-arrow">›</text>
+    </view>
+    <view class="setting-item" bindtap="onAbout">
+      <text class="setting-text">关于榫卯</text>
+      <text class="setting-value">v1.0.0</text>
+    </view>
+  </view>
+
+  <view wx:if="{{isLogin}}" class="logout-section">
+    <view class="logout-btn" bindtap="onLogout" hover-class="btn-hover">退出登录</view>
+  </view>
+</view>

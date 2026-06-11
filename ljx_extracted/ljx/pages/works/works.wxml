@@ -1,0 +1,31 @@
+<view class="subpage">
+  <view class="subpage-header">
+    <view class="back-btn" bindtap="goBack" hover-class="btn-hover">‹</view>
+    <text class="subpage-title">我的作品</text>
+    <view class="upload-btn" bindtap="onUpload" hover-class="btn-hover">＋ 发布</view>
+  </view>
+
+  <view class="stats-bar">
+    <view class="stat-pill"><text class="stat-pill-num">{{works.length}}</text><text>个作品</text></view>
+    <view class="stat-pill"><text class="stat-pill-num">{{totalLikes}}</text><text>次点赞</text></view>
+    <view class="stat-pill"><text class="stat-pill-num">{{totalViews}}</text><text>次浏览</text></view>
+  </view>
+
+  <view class="works-grid" wx:if="{{works.length}}">
+    <view class="work-card" wx:for="{{works}}" wx:key="id">
+      <image class="work-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="work-info">
+        <text class="work-title">{{item.title}}</text>
+        <view class="work-meta">
+          <text class="work-stats">♡ {{item.likes}}  💬 {{item.comments}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>
+    <text class="empty-icon">🎨</text>
+    <text class="empty-text">还没有作品</text>
+    <text class="empty-sub">点击右上角「发布」分享你的榫卯作品</text>
+  </view>
+</view>

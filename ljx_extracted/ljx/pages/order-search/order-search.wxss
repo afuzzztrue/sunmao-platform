@@ -1,0 +1,44 @@
+page{background:var(--color-bg,#F5F0E8)}
+
+.container{padding:0;background:var(--color-bg,#F5F0E8);min-height:100vh}
+
+/* 顶部搜索栏：白底 + 圆角输入框 + 右侧取消按钮 */
+.search-bar{display:flex;align-items:center;padding:24rpx 24rpx 20rpx;background:var(--color-bg-card,#FFFFFF);box-shadow:var(--shadow-sm,0 2rpx 8rpx rgba(62,39,35,0.06));position:sticky;top:0;z-index:10}
+
+.search-input-wrap{flex:1;display:flex;align-items:center;background:var(--color-bg,#F5F0E8);border-radius:var(--radius-round,9999rpx);padding:14rpx 24rpx;border:2rpx solid transparent;transition:all 0.2s;box-sizing:border-box;min-width:0}
+.search-input-wrap:focus-within{border-color:var(--color-accent,#D4A45A);background:#FFFFFF}
+
+.search-icon{font-size:28rpx;margin-right:12rpx;line-height:1;flex-shrink:0}
+.search-input{flex:1;font-size:28rpx;color:var(--color-text,#1A1A1A);height:44rpx;line-height:44rpx;background:transparent;min-width:0}
+.search-placeholder-class{color:var(--color-text-muted,#9B8E85);font-size:28rpx}
+.search-clear{width:36rpx;height:36rpx;background:rgba(155,142,133,0.20);color:#FFFFFF;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22rpx;margin-left:12rpx;flex-shrink:0}
+.search-cancel{font-size:28rpx;color:var(--color-text,#1A1A1A);margin-left:20rpx;flex-shrink:0;font-weight:500}
+
+/* 搜索结果提示 */
+.result-tip{padding:20rpx 32rpx 8rpx;font-size:24rpx;color:var(--color-text-muted,#9B8E85)}
+.result-count{color:var(--color-accent,#D4A45A);font-weight:700;margin:0 4rpx}
+
+/* 订单列表：复用 order.wxss 卡片样式 */
+.order-list{padding:16rpx 24rpx 40rpx}
+.order-card{background:var(--color-bg-card,#FFFFFF);border-radius:var(--radius-md,20rpx);padding:28rpx 32rpx;margin-bottom:20rpx;box-shadow:var(--shadow-sm,0 2rpx 8rpx rgba(62,39,35,0.06));transition:all 0.2s ease;position:relative}
+.card-hover{background:#FBF7F1;transform:scale(0.99);box-shadow:0 2rpx 12rpx rgba(212,164,90,0.18)}
+.tap-hint{position:absolute;right:24rpx;top:24rpx;font-size:20rpx;color:var(--color-text-muted,#9B8E85);opacity:0.55;letter-spacing:1rpx}
+.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14rpx}
+.order-name{font-size:32rpx;font-weight:600;color:var(--color-text,#1A1A1A);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qty-badge{display:inline-flex;align-items:center;justify-content:center;min-width:48rpx;height:36rpx;padding:0 12rpx;border-radius:var(--radius-sm,12rpx);background:rgba(212,164,90,0.12);margin-left:16rpx;flex-shrink:0}
+.qty-badge text{font-size:22rpx;color:var(--color-accent,#D4A45A);font-weight:600}
+.order-price{font-size:30rpx;color:var(--color-accent,#D4A45A);font-weight:600;display:block;margin-bottom:14rpx}
+.card-bottom{display:flex;align-items:center;justify-content:space-between}
+.order-status{font-size:24rpx;font-weight:500;padding:6rpx 18rpx;border-radius:var(--radius-round,9999rpx)}
+.status-0{color:#E8A838;background:rgba(232,168,56,0.12)}
+.status-1{color:#7D9A6A;background:rgba(125,154,106,0.12)}
+.status-2{color:#D4A45A;background:rgba(212,164,90,0.12)}
+.status-3{color:#3E2723;background:rgba(62,39,35,0.10)}
+.status-4{color:#9B8E85;background:rgba(155,142,133,0.18)}
+.order-time{font-size:22rpx;color:var(--color-text-muted,#9B8E85)}
+
+/* 空状态 */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:160rpx 40rpx}
+.empty-icon{font-size:80rpx;opacity:0.40;margin-bottom:24rpx;line-height:1}
+.empty-text{font-size:28rpx;color:var(--color-text-muted,#9B8E85);font-weight:500}
+.empty-sub{font-size:24rpx;color:var(--color-text-muted,#9B8E85);margin-top:10rpx;opacity:0.6}

@@ -1,0 +1,31 @@
+<view class="subpage">
+  <view class="subpage-header">
+    <view class="back-btn" bindtap="goBack" hover-class="btn-hover">‹</view>
+    <text class="subpage-title">帮助与反馈</text>
+    <view class="back-btn" />
+  </view>
+
+  <view class="section-title">常见问题</view>
+  <view class="faq-list">
+    <view class="faq-item" wx:for="{{faqs}}" wx:key="q">
+      <view class="faq-q" data-i="{{index}}" bindtap="toggleFaq">
+        <text class="faq-q-text">{{item.q}}</text>
+        <text class="faq-arrow {{item.open ? 'open' : ''}}">▾</text>
+      </view>
+      <view class="faq-a" wx:if="{{item.open}}">{{item.a}}</view>
+    </view>
+  </view>
+
+  <view class="section-title">提交反馈</view>
+  <view class="feedback-card">
+    <textarea class="feedback-input" placeholder="请描述你遇到的问题或建议..." maxlength="200" bindinput="onFbInput" value="{{fbText}}" />
+    <view class="feedback-meta">
+      <text class="feedback-count">{{fbText.length}}/200</text>
+    </view>
+    <view class="feedback-contact">
+      <text class="feedback-contact-label">联系方式（可选）</text>
+      <input class="feedback-contact-input" placeholder="手机号或邮箱" value="{{fbContact}}" bindinput="onFbContact" />
+    </view>
+    <view class="feedback-submit" bindtap="onSubmit" hover-class="btn-hover">提交反馈</view>
+  </view>
+</view>

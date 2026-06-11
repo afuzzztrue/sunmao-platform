@@ -1,0 +1,66 @@
+{
+  "pages": [
+    "pages/my/my",
+    "pages/shop/shop",
+    "pages/sort/sort",
+    "pages/index/index",
+    "pages/login/login",
+    "pages/register/register",
+    "pages/chat/chat",
+    "pages/admin/admin",
+    "pages/admin/admin-edit/admin-edit",
+    "pages/product/product",
+    "pages/order/order",
+    "pages/order-search/order-search",
+    "pages/footprint/footprint",
+    "pages/works/works",
+    "pages/downloads/downloads",
+    "pages/likes/likes",
+    "pages/help/help",
+    "pages/support/support",
+    "pages/settings/settings",
+    "pages/global-search/global-search"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "榫卯分享平台",
+    "navigationBarBackgroundColor": "#3E2723"
+  },
+  "tabBar": {
+    "color": "#9B8E85",
+    "selectedColor": "#3E2723",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "pages/images/index-0.png",
+        "selectedIconPath": "pages/images/index-1.png"
+      },
+      {
+        "pagePath": "pages/sort/sort",
+        "text": "分类",
+        "iconPath": "pages/images/sort-0.png",
+        "selectedIconPath": "pages/images/sort-1.png"
+      },
+      {
+        "pagePath": "pages/shop/shop",
+        "text": "商城",
+        "iconPath": "pages/images/place-0.png",
+        "selectedIconPath": "pages/images/place-1.png"
+      },
+      {
+        "pagePath": "pages/my/my",
+        "text": "我的",
+        "iconPath": "pages/images/my-0.png",
+        "selectedIconPath": "pages/images/my-1.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

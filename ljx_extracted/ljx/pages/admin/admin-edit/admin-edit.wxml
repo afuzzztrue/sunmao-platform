@@ -1,0 +1,27 @@
+<view class="edit-container">
+  <view class="form-card">
+    <view class="form-item">
+      <text class="form-label">账号</text>
+      <input class="form-input" placeholder="手机号或邮箱" value="{{form.account}}" bindinput="onAccount" disabled="{{isEdit}}" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">昵称</text>
+      <input class="form-input" placeholder="请输入昵称" value="{{form.nickname}}" bindinput="onNickname" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">密码</text>
+      <input class="form-input" placeholder="留空则不修改" password value="{{form.password}}" bindinput="onPassword" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">用户类型</text>
+      <picker mode="selector" range="{{userTypes}}" value="{{form.userType}}" bindchange="onTypeChange">
+        <view class="form-picker">{{userTypes[form.userType]}}</view>
+      </picker>
+    </view>
+    <view class="form-item form-item-last">
+      <text class="form-label">启用状态</text>
+      <switch checked="{{form.status == 1}}" bindchange="onStatusChange" color="#3E2723" />
+    </view>
+  </view>
+  <button class="btn-save" bindtap="doSave">{{isEdit ? '保存修改' : '添加用户'}}</button>
+</view>
