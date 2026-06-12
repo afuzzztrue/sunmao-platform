@@ -832,7 +832,7 @@ Host github.com
     User git
 ```
 
-验证：`ssh -T git@github.com` → `Hi afuzzzture! You've successfully authenticated`
+验证：`ssh -T git@github.com` → `Hi afuzzztrue! You've successfully authenticated`
 
 #### 🟡 问题 21：测试模式账号不写入数据库（5/27 16:35）
 
