@@ -1,9 +1,11 @@
 {
   "pages": [
-    "pages/my/my",
-    "pages/shop/shop",
-    "pages/sort/sort",
     "pages/index/index",
+    "pages/sort/sort",
+    "pages/_placeholder/placeholder",
+    "pages/shop/shop",
+    "pages/my/my",
+    "pages/publish/publish",
     "pages/login/login",
     "pages/register/register",
     "pages/chat/chat",
@@ -28,6 +30,7 @@
     "navigationBarBackgroundColor": "#3E2723"
   },
   "tabBar": {
+    "custom": true,
     "color": "#9B8E85",
     "selectedColor": "#3E2723",
     "backgroundColor": "#FFFFFF",
@@ -35,27 +38,23 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页",
-        "iconPath": "pages/images/index-0.png",
-        "selectedIconPath": "pages/images/index-1.png"
+        "text": "首页"
       },
       {
         "pagePath": "pages/sort/sort",
-        "text": "分类",
-        "iconPath": "pages/images/sort-0.png",
-        "selectedIconPath": "pages/images/sort-1.png"
+        "text": "分类"
+      },
+      {
+        "pagePath": "pages/_placeholder/placeholder",
+        "text": "发布"
       },
       {
         "pagePath": "pages/shop/shop",
-        "text": "商城",
-        "iconPath": "pages/images/place-0.png",
-        "selectedIconPath": "pages/images/place-1.png"
+        "text": "商城"
       },
       {
         "pagePath": "pages/my/my",
-        "text": "我的",
-        "iconPath": "pages/images/my-0.png",
-        "selectedIconPath": "pages/images/my-1.png"
+        "text": "我的"
       }
     ]
   },

@@ -1,17 +1,88 @@
-<!-- index.wxml - 榫卯首页 -->
+<!-- index.wxml - 榫卯首页 v2.0 抖音风 -->
+<!-- 改造日期: 2026-06-24 -->
+<!-- 改造范围: 仅 UI, 不动后端 API, 不动 4 Tab 结构 -->
+
+<!-- WXS 工具: 数字格式化 (1.2w / 1.5k) -->
+<wxs module="utils">
+module.exports = {
+  formatCount: function(num) {
+    if (!num) return '0';
+    if (num >= 10000) return (num/10000).toFixed(1) + 'w';
+    if (num >= 1000) return (num/1000).toFixed(1) + 'k';
+    return num + '';
+  }
+};
+</wxs>
+
 <view class="page">
-  <!-- 搜索栏 -->
-  <view class="search-bar">
-    <view class="search-bar-inner">
-      <image class="search-icon" src="../images/saearch.png" />
-      <input class="search-input" placeholder="搜索榫卯结构" placeholder-class="search-placeholder" />
+
+  <!-- ========== 顶部横滑 tab (sticky) ========== -->
+  <view class="top-tabs">
+    <view class="menu-btn" bindtap="onTapMenu">
+      <text class="menu-icon">☰</text>
     </view>
-    <image class="remind-icon" src="../images/remind.png" />
+
+    <scroll-view
+      scroll-x
+      class="tabs-scroll"
+      enhanced
+      show-scrollbar="{{false}}"
+      scroll-with-animation
+      scroll-into-view="tab-{{currentTab}}"
+    >
+      <view
+        wx:for="{{topTabs}}"
+        wx:key="key"
+        id="tab-{{item.key}}"
+        class="tab-item {{currentTab === item.key ? 'active' : ''}}"
+        bindtap="onSwitchTab"
+        data-key="{{item.key}}"
+      >
+        <text class="tab-text">{{item.label}}</text>
+        <view wx:if="{{item.badge}}" class="tab-badge"></view>
+      </view>
+    </scroll-view>
+
+    <view class="search-btn" bindtap="onTapSearch">
+      <text class="search-icon-text">🔍</text>
+    </view>
   </view>
 
-  <!-- 轮播图 -->
+  <!-- ========== 搜索浮层 ========== -->
+  <view class="search-modal {{showSearch ? 'show' : ''}}">
+    <view class="search-modal-mask" bindtap="onCloseSearch"></view>
+    <view class="search-modal-body">
+      <view class="search-bar">
+        <image class="search-icon" src="../images/saearch.png" />
+        <input
+          class="search-input"
+          placeholder="搜索榫卯结构 / 家具 / 教程"
+          placeholder-class="search-placeholder"
+          focus="{{showSearch}}"
+          confirm-type="search"
+          bindconfirm="onSearchConfirm"
+        />
+        <text class="search-cancel" bindtap="onCloseSearch">取消</text>
+      </view>
+      <view class="hot-keywords">
+        <text class="hot-keywords-label">热门搜索</text>
+        <view class="hot-keywords-list">
+          <text class="hot-keyword" wx:for="{{hotKeywords}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 轮播图 ========== -->
   <view class="banner-wrapper">
-    <swiper class="banner" indicator-dots indicator-color="rgba(255,255,255,0.4)" indicator-active-color="#D4A45A" autoplay circular>
+    <swiper
+      class="banner"
+      indicator-dots
+      indicator-color="rgba(255,255,255,0.4)"
+      indicator-active-color="#E5B97A"
+      autoplay
+      circular
+    >
       <swiper-item wx:for="{{bannerList}}" wx:key="index">
         <image src="{{item}}" mode="aspectFill" class="banner-img" />
         <view class="banner-overlay"></view>
@@ -19,110 +90,70 @@
     </swiper>
   </view>
 
-  <!-- 四模块入口 -->
-  <view class="module-section">
-    <view class="module-list">
-      <view class="module-item">
-        <view class="hexagon">
-          <view class="hexagon-inner"></view>
-          <image class="module-icon" src="../images/技艺教程.png" />
+  <!-- ========== 双列瀑布流 (核心) ========== -->
+  <view class="waterfall">
+    <view class="waterfall-col">
+      <view
+        class="waterfall-card"
+        wx:for="{{leftList}}"
+        wx:key="articleId"
+        bindtap="onTapCard"
+        data-id="{{item.articleId}}"
+      >
+        <image
+          class="waterfall-img"
+          src="{{item.coverImage}}"
+          mode="widthFix"
+          lazy-load="{{true}}"
+        />
+        <view class="waterfall-body">
+          <text class="waterfall-title">{{item.title}}</text>
+          <view class="waterfall-meta">
+            <text class="waterfall-author">@{{item.userId || '榫卯'}}</text>
+            <view class="waterfall-likes">
+              <text class="waterfall-heart">♥</text>
+              <text class="waterfall-likes-num">{{utils.formatCount(item.viewCount)}}</text>
+            </view>
+          </view>
         </view>
-        <text class="module-text">技艺教程</text>
       </view>
-      <view class="module-item">
-        <view class="hexagon">
-          <view class="hexagon-inner"></view>
-          <image class="module-icon" src="../images/传承人.png" />
+    </view>
+
+    <view class="waterfall-col">
+      <view
+        class="waterfall-card"
+        wx:for="{{rightList}}"
+        wx:key="articleId"
+        bindtap="onTapCard"
+        data-id="{{item.articleId}}"
+      >
+        <image
+          class="waterfall-img"
+          src="{{item.coverImage}}"
+          mode="widthFix"
+          lazy-load="{{true}}"
+        />
+        <view class="waterfall-body">
+          <text class="waterfall-title">{{item.title}}</text>
+          <view class="waterfall-meta">
+            <text class="waterfall-author">@{{item.userId || '榫卯'}}</text>
+            <view class="waterfall-likes">
+              <text class="waterfall-heart">♥</text>
+              <text class="waterfall-likes-num">{{utils.formatCount(item.viewCount)}}</text>
+            </view>
+          </view>
         </view>
-        <text class="module-text">传承人</text>
-      </view>
-      <view class="module-item">
-        <view class="hexagon">
-          <view class="hexagon-inner"></view>
-          <image class="module-icon" src="../images/故事.png" />
-        </view>
-        <text class="module-text">故事</text>
-      </view>
-      <view class="module-item">
-        <view class="hexagon">
-          <view class="hexagon-inner"></view>
-          <image class="module-icon" src="../images/作品.png" />
-        </view>
-        <text class="module-text">作品</text>
       </view>
     </view>
   </view>
 
-  <!-- 热门内容 -->
-  <view class="hot-section">
-    <view class="section-header">
-      <view class="section-title-wrap">
-        <view class="section-accent"></view>
-        <text class="section-title">热门内容</text>
-      </view>
-      <view class="more-btn">
-        <text>更多</text>
-        <image class="arrow-icon" src="../images/向右箭头.png" />
-      </view>
-    </view>
-    <scroll-view class="hot-scroll" scroll-x enable-flex>
-      <view class="hot-item" wx:for="{{hotList}}" wx:key="index">
-        <view class="hot-img-wrap">
-          <image class="hot-img" src="{{item}}" mode="aspectFill" />
-          <view class="hot-img-shade"></view>
-        </view>
-      </view>
-    </scroll-view>
+  <!-- ========== 空状态 ========== -->
+  <view class="empty-state" wx:if="{{!loading && leftList.length === 0 && rightList.length === 0}}">
+    <text class="empty-icon">🪵</text>
+    <text class="empty-text">暂无内容，下拉刷新试试</text>
   </view>
 
-  <!-- 内容卡片 -->
-  <view class="content-section">
-    <view class="content-card">
-      <view class="card-img-wrap">
-        <image src="../images/太和殿.jpg" mode="aspectFill" class="card-img" />
-        <view class="card-img-tag">宫殿建筑</view>
-      </view>
-      <view class="card-body">
-        <view class="card-tags">
-          <text class="tag">宫殿建筑</text>
-          <text class="location">北京·故宫</text>
-        </view>
-        <text class="card-title">太和殿：榫卯之巅</text>
-        <view class="card-divider"></view>
-        <text class="card-desc">作为现存中国最大的木构建筑，太和殿通过成千上万个复杂的榫卯构件交织，无需一颗钉子，经受了数百年的风雨与地震。</text>
-      </view>
-    </view>
+  <!-- 自定义 tabBar (抖音式, 中间 + 号) -->
+  <custom-tab-bar />
 
-    <view class="content-card">
-      <view class="card-img-wrap">
-        <image src="../images/宗教建筑.jpg" mode="aspectFill" class="card-img" />
-        <view class="card-img-tag">宗教建筑</view>
-      </view>
-      <view class="card-body">
-        <view class="card-tags">
-          <text class="tag">宗教建筑</text>
-          <text class="location"></text>
-        </view>
-        <text class="card-title">山西·大同寺</text>
-        <view class="card-divider"></view>
-        <text class="card-desc">方形，高43.5 米，外观三层、实则五层（明三暗二），典型辽金风格。2008 年依辽代形制复建，纯木榫卯、无钉无铆，全国第二大木塔（仅次于应县木塔）。</text>
-      </view>
-    </view>
-
-    <view class="content-card">
-      <view class="card-img-wrap">
-        <image src="../images/家具.jpg" mode="aspectFill" class="card-img" />
-        <view class="card-img-tag">家具美学</view>
-      </view>
-      <view class="card-body">
-        <view class="card-tags">
-          <text class="tag">家具美学</text>
-          <text class="location">明式风骨</text>
-        </view>
-        <text class="card-title">明式家具：极简结构</text>
-        <view class="card-divider"></view>
-        <text class="card-desc">明式家具以其极简的结构和设计而闻名，将榫卯结构发挥到了艺术极致，线条洗练，严丝合缝，强调功能和美学的平衡。</text>
-      </view>
-    </view>
-  </view>
 </view>

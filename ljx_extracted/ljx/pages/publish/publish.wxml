@@ -1,0 +1,94 @@
+<view class="page">
+  <view class="header">
+    <view class="back-btn" bindtap="onCancel">‹</view>
+    <text class="header-title">发布作品</text>
+    <view class="draft-btn" bindtap="onSaveDraft">草稿</view>
+  </view>
+
+  <view class="form">
+
+    <view class="form-item">
+      <text class="label">封面图（必填）</text>
+      <view class="cover-uploader" wx:if="{{!coverImage}}" bindtap="onChooseCover">
+        <text class="cover-plus">+</text>
+        <text class="cover-tip">点击上传封面（建议 4:3）</text>
+      </view>
+      <view class="cover-preview" wx:else bindtap="onChooseCover">
+        <image class="cover-img" src="{{coverImage}}" mode="aspectFill" />
+        <view class="cover-remove" catchtap="onRemoveCover">×</view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="label">标题</text>
+      <input
+        class="form-input"
+        type="text"
+        placeholder="给作品起个名字（20字以内）"
+        maxlength="20"
+        value="{{title}}"
+        bindinput="onTitleInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="label">描述</text>
+      <textarea
+        class="form-textarea"
+        placeholder="详细描述你的作品（材质、尺寸、制作心得等）"
+        maxlength="500"
+        value="{{content}}"
+        bindinput="onContentInput"
+        auto-height
+      />
+      <text class="form-counter">{{content.length}}/500</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">分类</text>
+      <picker mode="selector" range="{{categoryList}}" range-key="name" bindchange="onCategoryChange">
+        <view class="picker-value">
+          <text wx:if="{{selectedCategory.name}}">{{selectedCategory.name}}</text>
+          <text class="placeholder" wx:else>请选择分类</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">标签（逗号分隔，最多 5 个）</text>
+      <input
+        class="form-input"
+        type="text"
+        placeholder="如：燕尾榫,明式,小叶紫檀"
+        maxlength="50"
+        value="{{tagsInput}}"
+        bindinput="onTagsInput"
+      />
+      <view class="tag-preview" wx:if="{{tagsList.length}}">
+        <text class="tag-chip" wx:for="{{tagsList}}" wx:key="*this">#{{item}}</text>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="label">作品图集（最多 9 张）</text>
+      <view class="image-grid">
+        <view class="image-item" wx:for="{{images}}" wx:key="index">
+          <image class="image-thumb" src="{{item}}" mode="aspectFill" />
+          <view class="image-remove" catchtap="onRemoveImage" data-index="{{index}}">×</view>
+        </view>
+        <view class="image-add" wx:if="{{images.length < 9}}" bindtap="onChooseImages">
+          <text class="image-add-plus">+</text>
+          <text class="image-add-text">添加图片</text>
+        </view>
+      </view>
+    </view>
+
+  </view>
+
+  <view class="bottom-bar">
+    <button class="submit-btn" bindtap="onSubmit" disabled="{{submitting}}">
+      {{submitting ? '发布中...' : '发布作品'}}
+    </button>
+  </view>
+</view>

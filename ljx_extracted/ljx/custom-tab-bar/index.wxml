@@ -1,0 +1,27 @@
+<view class="custom-tab-bar">
+  <view class="tab-item" data-url="/pages/index/index" bindtap="onSwitchTab">
+    <image class="tab-icon" src="/pages/images/index-{{selected === 0 ? '1' : '0'}}.png" />
+    <text class="tab-text {{selected === 0 ? 'active' : ''}}">首页</text>
+  </view>
+
+  <view class="tab-item" data-url="/pages/sort/sort" bindtap="onSwitchTab">
+    <image class="tab-icon" src="/pages/images/sort-{{selected === 1 ? '1' : '0'}}.png" />
+    <text class="tab-text {{selected === 1 ? 'active' : ''}}">分类</text>
+  </view>
+
+  <view class="tab-item publish-btn" bindtap="onPublish">
+    <view class="publish-circle">
+      <text class="publish-icon">+</text>
+    </view>
+  </view>
+
+  <view class="tab-item" data-url="/pages/shop/shop" bindtap="onSwitchTab">
+    <image class="tab-icon" src="/pages/images/place-{{selected === 3 ? '1' : '0'}}.png" />
+    <text class="tab-text {{selected === 3 ? 'active' : ''}}">商城</text>
+  </view>
+
+  <view class="tab-item" data-url="/pages/my/my" bindtap="onSwitchTab">
+    <image class="tab-icon" src="/pages/images/my-{{selected === 4 ? '1' : '0'}}.png" />
+    <text class="tab-text {{selected === 4 ? 'active' : ''}}">我的</text>
+  </view>
+</view>

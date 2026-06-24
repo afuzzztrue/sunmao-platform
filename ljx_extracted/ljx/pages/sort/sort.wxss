@@ -10,6 +10,12 @@ page {
   background: linear-gradient(180deg, #3E2723 0%, #4E342E 100%);
 }
 
+/* 自定义 tabBar 占位 (160rpx = 110rpx tabBar + 50rpx safe-area) */
+.page-wrapper {
+  padding-bottom: 160rpx;
+  box-sizing: border-box;
+}
+
 .header-left {
   display: flex;
   align-items: center;

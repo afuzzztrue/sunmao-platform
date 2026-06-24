@@ -119,4 +119,8 @@
   </view>
 
   <view class="safe-bottom"></view>
+
+  <!-- 自定义 tabBar (抖音式, 中间 + 号) -->
+  <custom-tab-bar />
+
 </view>

@@ -41,4 +41,8 @@
       <text>暂无商品，匠人正在赶制中...</text>
     </view>
   </view>
+
+  <!-- 自定义 tabBar (抖音式, 中间 + 号) -->
+  <custom-tab-bar />
+
 </view>

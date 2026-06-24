@@ -1,22 +1,48 @@
-// index.js
+// index.js - 榫卯首页 v2.0 抖音风
+// 改造日期: 2026-06-24
+// 改造范围: 仅渲染逻辑, 后端 API 完全不动
+
 const app = getApp();
 const baseUrl = app.globalData.baseUrl;
-console.log(app,899)
 
 Page({
   data: {
-    dataList: [],
+    // 顶部横滑 tab 配置
+    topTabs: [
+      { key: 'recommend', label: '推荐', badge: false },
+      { key: 'follow',    label: '关注', badge: false },
+      { key: 'structure', label: '结构', badge: false },
+      { key: 'furniture', label: '家具', badge: false },
+      { key: 'wood',      label: '木料', badge: false },
+      { key: 'tool',      label: '工具', badge: false },
+      { key: 'tutorial',  label: '教程', badge: false }
+    ],
+    currentTab: 'recommend',
+
+    // 搜索浮层
+    showSearch: false,
+    hotKeywords: ['明式家具', '燕尾榫', '紫檀', '官帽椅', '明式圈椅'],
+
+    // 轮播图
     bannerList: [],
-    hotList: [],
-    articleList: []
+
+    // 文章列表 (用于瀑布流)
+    articleList: [],
+
+    // 瀑布流左/右列
+    leftList: [],
+    rightList: [],
+
+    // 加载状态
+    loading: true
   },
 
-  onLoad: function() {
-    console.log('index加载页面的时候触发-onLoad');
+  onLoad: function () {
     this.loadBannerList();
-    this.loadHotList();
     this.loadArticleList();
   },
+
+  // ========== 原有 API 调用 (完全不动) ==========
 
   loadBannerList() {
     wx.request({
@@ -33,53 +59,111 @@ Page({
     });
   },
 
-  loadHotList() {
-    wx.request({
-      url: baseUrl + '/api/article/hot',
-      data: { limit: 4 },
-      success: res => {
-        if (res.data.code === 200) {
-          const hotList = res.data.data.map(item => item.coverImage);
-          this.setData({ hotList });
-        }
-      },
-      fail: err => {
-        console.error('获取热门内容失败', err);
-      }
-    });
-  },
-
   loadArticleList() {
     wx.request({
       url: baseUrl + '/api/article/hot',
       data: { limit: 10 },
       success: res => {
         if (res.data.code === 200) {
-          this.setData({ articleList: res.data.data });
+          this.setData({
+            articleList: res.data.data,
+            loading: false
+          }, () => {
+            this.splitArticleList();
+          });
         }
       },
       fail: err => {
         console.error('获取文章列表失败', err);
+        this.setData({ loading: false });
       }
     });
   },
 
-  onShow() {
-    console.log('index进入页面-onshow');
+  // ========== 双列瀑布流拆分 ==========
+
+  splitArticleList() {
+    const left = [];
+    const right = [];
+    this.data.articleList.forEach((item, index) => {
+      if (index % 2 === 0) {
+        left.push(item);
+      } else {
+        right.push(item);
+      }
+    });
+    this.setData({ leftList: left, rightList: right });
   },
 
-  onHide() {
-    console.log('index离开页面-onHide');
+  // ========== 顶部 tab 交互 ==========
+
+  onSwitchTab(e) {
+    const key = e.currentTarget.dataset.key;
+    this.setData({ currentTab: key });
+    // TODO: 按 tab key 调用 /api/article/category/{id} 或 /api/article/follow
   },
 
-  onReady() {
-    console.log('index页面渲染完成-onReady');
+  // ========== 搜索浮层 ==========
+
+  onTapSearch() {
+    this.setData({ showSearch: true });
   },
+
+  onCloseSearch() {
+    this.setData({ showSearch: false });
+  },
+
+  onSearchConfirm(e) {
+    const keyword = e.detail.value;
+    if (!keyword || !keyword.trim()) {
+      wx.showToast({ title: '请输入搜索词', icon: 'none' });
+      return;
+    }
+    wx.navigateTo({
+      url: '/pages/global-search/global-search?keyword=' + encodeURIComponent(keyword)
+    });
+    this.setData({ showSearch: false });
+  },
+
+  // ========== 侧边菜单 (占位) ==========
+
+  onTapMenu() {
+    wx.showActionSheet({
+      itemList: ['技艺教程', '传承人', '故事', '作品', '取消'],
+      success: res => {
+        if (res.tapIndex < 4) {
+          wx.showToast({
+            title: '功能开发中',
+            icon: 'none'
+          });
+        }
+      }
+    });
+  },
+
+  // ========== 瀑布流卡片点击 ==========
+
+  onTapCard(e) {
+    const articleId = e.currentTarget.dataset.id;
+    // TODO 下一轮: 新建 pages/article-detail 页面后, 改为:
+    //   wx.navigateTo({ url: '/pages/article-detail/article-detail?id=' + articleId });
+    wx.showToast({
+      title: '详情页开发中 #' + articleId,
+      icon: 'none'
+    });
+  },
+
+  // ========== 生命周期 (保留) ==========
+
+  onShow() {},
+
+  onHide() {},
+
+  onReady() {},
 
   onPullDownRefresh() {
-    console.log('index下拉刷新页面，获取最新数据-onPullDownRefresh');
+    this.setData({ loading: true });
     this.loadBannerList();
-    this.loadHotList();
     this.loadArticleList();
     wx.stopPullDownRefresh();
   }

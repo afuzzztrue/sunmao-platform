@@ -1,0 +1,4 @@
+<view class="placeholder">
+  <!-- 占位页: tabBar list[2] 的 pagePath 占位, 实际用户看不到此页 -->
+  <custom-tab-bar />
+</view>

@@ -233,6 +233,6 @@ page {
 }
 
 .safe-bottom {
-  height: env(safe-area-inset-bottom);
-  min-height: 20rpx;
+  height: 160rpx;
+  min-height: 160rpx;
 }
