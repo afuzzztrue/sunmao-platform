@@ -59,12 +59,16 @@ Page({
     });
   },
 
-  onPublish: function() {
-    wx.showModal({
-      title: '发布作品',
-      content: '发布功能演示，请在作品详情页上传图片后发布。',
-      showCancel: false
-    });
+  /**
+   * 6/26 修复: 右上角"发布"按钮
+   * 之前模板 bindtap="onUpload" 但方法叫 onPublish, 导致无反应
+   * 6/26 改名统一为 onUpload, 跳到首页加号同款发布页
+   */
+  onUpload: function() {
+    wx.navigateTo({ url: '/pages/publish/publish' });
+  },
+  onPublish: function() {  // 兼容老方法名
+    this.onUpload();
   },
 
   goBack: function() { wx.navigateBack(); }

@@ -2,24 +2,24 @@
   <view class="subpage-header">
     <view class="back-btn" bindtap="goBack" hover-class="btn-hover">‹</view>
     <text class="subpage-title">我的足迹</text>
-    <view class="back-btn" />
   </view>
 
-  <view class="filter-tabs">
-    <view class="filter-tab {{filterIdx==0?'active':''}}" data-i="0" bindtap="switchFilter">全部</view>
-    <view class="filter-tab {{filterIdx==1?'active':''}}" data-i="1" bindtap="switchFilter">本周</view>
-    <view class="filter-tab {{filterIdx==2?'active':''}}" data-i="2" bindtap="switchFilter">本月</view>
-    <view class="filter-tab {{filterIdx==3?'active':''}}" data-i="3" bindtap="switchFilter">更早</view>
+  <view class="subpage-stats">
+    <text class="stats-text">共 {{list.length}} 条浏览记录</text>
   </view>
 
   <view class="footprint-list" wx:if="{{list.length}}">
     <view class="day-group" wx:for="{{dayGroups}}" wx:for-item="day" wx:key="day">
       <text class="day-title">{{day.day}}</text>
-      <view class="footprint-card" wx:for="{{day.items}}" wx:for-item="o" wx:key="id" bindtap="goProduct" data-id="{{o.id}}">
-        <image class="fp-img" src="{{o.image}}" mode="aspectFill" />
+      <view class="footprint-card" wx:for="{{day.items}}" wx:for-item="o" wx:key="id"
+            bindtap="onTapCard"
+            data-id="{{o.targetId}}"
+            data-type="{{o.targetType}}"
+            hover-class="card-hover">
+        <image class="fp-img" src="{{o.coverImage}}" mode="aspectFill" />
         <view class="fp-info">
-          <text class="fp-name">{{o.name}}</text>
-          <text class="fp-price">¥{{o.price}}</text>
+          <text class="fp-name">{{o.title}}</text>
+          <view class="fp-type-badge type-{{o.targetType}}">{{o.typeName}}</view>
           <text class="fp-time">{{o.time}}</text>
         </view>
       </view>
@@ -29,6 +29,6 @@
   <view class="empty" wx:else>
     <text class="empty-icon">🦶</text>
     <text class="empty-text">还没有足迹</text>
-    <text class="empty-sub">去「商城」逛逛，浏览过的宝贝会出现在这里</text>
+    <text class="empty-sub">浏览过的文章/帖子/课程会出现在这里</text>
   </view>
 </view>
