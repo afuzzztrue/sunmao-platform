@@ -1,7 +1,7 @@
 -- ================================================================
--- 榫卯非遗文化传承平台 - 完整数据库初始化脚本 v2.0
+-- 榫卯非遗文化传承平台 - 完整数据库初始化脚本 v2.1
 -- --------------------------------------------------------------
--- 版本:       v2.0 (2026-06-24 终极整合版)
+-- 版本:       v2.1 (2026-06-26 整合版, 含 6 个问题修复)
 -- 适用数据库:  MySQL 8.0+ (已用 8.0.46 测试)
 -- 端口:        3307
 -- 字符集:      utf8mb4 / utf8mb4_unicode_ci
@@ -13,11 +13,17 @@
 --   3. migrations/2026-06-10-my-tabs-backend-integration  (feedback + 偏好 + 快照)
 --   4. schema_mysql8_full.sql v1.0                       (商城 2 张表)
 --   5. seed_articles_admin1.sql                          (admin1 + 12 article + 12 work)
+--   6. migrations/2026-06-26-fix-4-issues                (collect/footprint 加 target_type + target_id)
 -- --------------------------------------------------------------
 -- 表总数: 17 张
 --   user, sys_config, category, banner, article, post,
 --   like_record, comment, collect_record, follow, footprint,
 --   course, course_download, user_work, product, product_order, feedback
+-- --------------------------------------------------------------
+-- v2.1 变更 (2026-06-26):
+--   * collect_record 加 target_type + target_id 列, article_id 改为可空 (兼容老数据)
+--   * footprint     加 target_type + target_id 列, article_id 改为可空
+--   * collect_record 去掉 uk_collect_user_article 唯一约束 (改为普通索引, 支持多态收藏)
 -- --------------------------------------------------------------
 -- 种子数据:
 --   1 个 admin1 管理员用户
@@ -248,17 +254,20 @@ CREATE TABLE `comment` (
 
 
 -- ------------------------------------------------------------
--- 3.9 收藏记录表 collect_record
+-- 3.9 收藏记录表 collect_record (target_type 多态)
 -- ------------------------------------------------------------
 CREATE TABLE `collect_record` (
   `collect_id`  INT      NOT NULL AUTO_INCREMENT COMMENT '收藏ID',
   `user_id`     INT      NOT NULL COMMENT '用户ID',
-  `article_id`  INT      NOT NULL COMMENT '文章ID',
+  `article_id`  INT      DEFAULT NULL COMMENT '老字段: 文章ID (兼容老数据)',
+  `target_type` TINYINT  DEFAULT NULL COMMENT '目标类型: 1文章 2帖子 3课程 4作品 5结构',
+  `target_id`   INT      DEFAULT NULL COMMENT '目标ID (按 target_type 解释)',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '收藏时间',
   PRIMARY KEY (`collect_id`),
-  UNIQUE KEY `uk_collect_user_article` (`user_id`, `article_id`),
-  KEY        `idx_collect_article`    (`article_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='收藏记录表';
+  KEY        `idx_collect_user`         (`user_id`),
+  KEY        `idx_collect_article`      (`article_id`),
+  KEY        `idx_collect_user_target`  (`user_id`, `target_type`, `target_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='收藏记录表 (多态: target_type + target_id)';
 
 
 -- ------------------------------------------------------------
@@ -276,20 +285,23 @@ CREATE TABLE `follow` (
 
 
 -- ------------------------------------------------------------
--- 3.11 浏览足迹表 footprint (带快照字段)
+-- 3.11 浏览足迹表 footprint (target_type 多态 + 快照字段)
 -- ------------------------------------------------------------
 CREATE TABLE `footprint` (
   `footprint_id`     INT          NOT NULL AUTO_INCREMENT COMMENT '足迹ID',
   `user_id`          INT          NOT NULL COMMENT '用户ID',
-  `article_id`       INT          NOT NULL COMMENT '文章ID',
-  `snapshot_title`   VARCHAR(200) DEFAULT NULL COMMENT '文章标题快照 (防删除后空)',
-  `snapshot_cover`   VARCHAR(500) DEFAULT NULL COMMENT '文章封面快照',
-  `snapshot_author`  VARCHAR(100) DEFAULT NULL COMMENT '文章作者快照',
+  `article_id`       INT          DEFAULT NULL COMMENT '老字段: 文章ID (兼容老数据)',
+  `target_type`      TINYINT      DEFAULT NULL COMMENT '目标类型: 1文章 2帖子 3课程 4作品 5结构',
+  `target_id`        INT          DEFAULT NULL COMMENT '目标ID (按 target_type 解释)',
+  `snapshot_title`   VARCHAR(200) DEFAULT NULL COMMENT '标题快照 (防删除后空)',
+  `snapshot_cover`   VARCHAR(500) DEFAULT NULL COMMENT '封面快照',
+  `snapshot_author`  VARCHAR(100) DEFAULT NULL COMMENT '作者快照',
   `create_time`      DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '浏览时间',
   PRIMARY KEY (`footprint_id`),
-  KEY `idx_footprint_user` (`user_id`),
-  KEY `idx_footprint_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='浏览足迹表';
+  KEY `idx_footprint_user`        (`user_id`),
+  KEY `idx_footprint_time`        (`create_time`),
+  KEY `idx_footprint_user_target` (`user_id`, `target_type`, `target_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='浏览足迹表 (多态: target_type + target_id)';
 
 
 -- ------------------------------------------------------------

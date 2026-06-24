@@ -1,0 +1,239 @@
+/**pages/article-detail/article-detail.wxss**/
+/**文章详情页样式 6/25 新增**/
+
+.page {
+  background: var(--color-bg);
+  min-height: 100vh;
+  padding-bottom: 160rpx;
+}
+
+/* ========== 加载状态 ========== */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+
+.loading-icon {
+  font-size: 80rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.5;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: var(--color-text-muted);
+  letter-spacing: 1rpx;
+}
+
+/* ========== 封面图 ========== */
+.cover-wrapper {
+  position: relative;
+  width: 100%;
+  height: 480rpx;
+  overflow: hidden;
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.cover-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 200rpx;
+  background: linear-gradient(
+    to top,
+    var(--color-bg) 0%,
+    rgba(245, 240, 232, 0.5) 50%,
+    transparent 100%
+  );
+}
+
+/* ========== 标题区 ========== */
+.title-section {
+  padding: 32rpx 32rpx 16rpx;
+}
+
+.article-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.4;
+  letter-spacing: 1.5rpx;
+  margin-bottom: 16rpx;
+}
+
+.article-meta {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5rpx;
+}
+
+.meta-divider {
+  margin: 0 12rpx;
+  color: var(--color-text-muted);
+}
+
+/* ========== 摘要 ========== */
+.summary {
+  margin: 0 32rpx 32rpx;
+  padding: 20rpx 24rpx;
+  background: var(--color-bg-card);
+  border-left: 6rpx solid #E5B97A;
+  border-radius: 8rpx;
+}
+
+.summary-text {
+  display: block;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  letter-spacing: 0.5rpx;
+  font-style: italic;
+}
+
+/* ========== 正文 ========== */
+.content {
+  padding: 0 32rpx 32rpx;
+}
+
+.content-text {
+  display: block;
+  font-size: 32rpx;
+  color: var(--color-text);
+  line-height: 1.8;
+  letter-spacing: 1rpx;
+  white-space: pre-wrap;       /* 保留换行 */
+  word-break: break-all;
+}
+
+/* ========== 配图 ========== */
+.images-section {
+  padding: 0 32rpx 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.content-img {
+  width: 100%;
+  display: block;
+  border-radius: 12rpx;
+  background: #f0e8d8;
+}
+
+/* ========== 标签 ========== */
+.tags-section {
+  padding: 16rpx 32rpx 32rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.tag {
+  display: inline-block;
+  padding: 6rpx 18rpx;
+  background: rgba(229, 185, 122, 0.15);
+  color: #B8860B;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  letter-spacing: 0.5rpx;
+}
+
+/* ========== 统计 ========== */
+.stats-section {
+  margin: 24rpx 32rpx;
+  padding: 20rpx 24rpx;
+  background: var(--color-bg-card);
+  border-radius: 12rpx;
+  display: flex;
+  justify-content: space-around;
+  border: 1rpx solid var(--color-border);
+}
+
+.stat-item {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.5rpx;
+}
+
+/* ========== 占位 ========== */
+.bottom-spacer {
+  height: 120rpx;
+}
+
+/* ========== 底部操作栏 ========== */
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 110rpx;
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-top: 1rpx solid var(--color-border);
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  padding: 0 16rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 999;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  border-radius: 12rpx;
+  transition: background 0.2s ease;
+}
+
+.action-btn:active {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.action-btn.active .action-text {
+  color: #D8584B;
+}
+
+.action-icon {
+  font-size: 36rpx;
+  line-height: 1;
+  margin-bottom: 4rpx;
+}
+
+.action-text {
+  font-size: 20rpx;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.5rpx;
+}
+
+.share-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  background: transparent !important;
+  border: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.share-btn::after {
+  border: none;
+}

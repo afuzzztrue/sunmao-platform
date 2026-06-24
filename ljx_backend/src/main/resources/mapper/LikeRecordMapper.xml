@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunmao.ljx.mapper.LikeRecordMapper">
+
+    <!--
+        我的点赞 (含真实标题/封面)
+        target_type: 1=文章 2=帖子 3=课程 4=作品 5=结构
+        6/26 升级: 改用 LEFT JOIN, 更稳健; 字段名加双引号强制大小写
+        (MySQL 默认大小写不敏感, 不加引号会变成小写 coverimage, JS 读不到)
+
+        帖子 (type=2) 的"标题"用 content 截前 40 字, 封面从 images 取第一张
+    -->
+    <select id="selectMyLikesEnriched" resultType="java.util.HashMap">
+        SELECT lr.like_id     AS "likeId",
+               lr.target_type AS "targetType",
+               lr.target_id   AS "targetId",
+               lr.create_time AS "createTime",
+               COALESCE(
+                   a.title,
+                   a5.title,
+                   SUBSTRING(p_sub.content, 1, 40),
+                   c.title,
+                   w.title,
+                   ''
+               ) AS "title",
+               COALESCE(
+                   a.cover_image,
+                   a5.cover_image,
+                   SUBSTRING_INDEX(p_sub.images, ',', 1),
+                   c.cover_image,
+                   SUBSTRING_INDEX(w.images, ',', 1),
+                   ''
+               ) AS "coverImage"
+          FROM like_record lr
+          LEFT JOIN article a   ON lr.target_type = 1 AND lr.target_id = a.article_id
+          LEFT JOIN article a5  ON lr.target_type = 5 AND lr.target_id = a5.article_id AND a5.category_id = 1
+          LEFT JOIN post p_sub  ON lr.target_type = 2 AND lr.target_id = p_sub.post_id
+          LEFT JOIN course c    ON lr.target_type = 3 AND lr.target_id = c.course_id
+          LEFT JOIN user_work w ON lr.target_type = 4 AND lr.target_id = w.work_id
+         WHERE lr.user_id = #{userId}
+         ORDER BY lr.create_time DESC
+         LIMIT #{limit}
+    </select>
+
+</mapper>

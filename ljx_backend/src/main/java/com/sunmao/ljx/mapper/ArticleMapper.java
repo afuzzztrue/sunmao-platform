@@ -15,7 +15,7 @@ import java.util.List;
 @Mapper
 public interface ArticleMapper extends BaseMapper<Article> {
 
-    @Select("SELECT * FROM article WHERE is_hot = 1 AND status = 1 ORDER BY sort_order, create_time DESC LIMIT #{limit}")
+    @Select("SELECT * FROM article WHERE status = 1 ORDER BY create_time DESC, article_id DESC LIMIT #{limit}")
     List<Article> selectHotList(@Param("limit") Integer limit);
 
     @Select("SELECT * FROM article WHERE category_id = #{categoryId} AND status = 1 ORDER BY create_time DESC")

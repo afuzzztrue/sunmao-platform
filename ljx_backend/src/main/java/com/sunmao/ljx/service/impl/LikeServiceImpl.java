@@ -22,6 +22,6 @@ public class LikeServiceImpl extends ServiceImpl<LikeRecordMapper, LikeRecord> i
     @Override
     public List<Map<String, Object>> myLikes(Integer userId, Integer limit) {
         if (limit == null || limit <= 0) limit = 50;
-        return likeRecordMapper.selectMyLikes(userId, limit);
+        return likeRecordMapper.selectMyLikesEnriched(userId, limit);
     }
 }

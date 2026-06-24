@@ -13,6 +13,12 @@ Component({
     }
   },
 
+  /**
+   * 高亮同步改为由每个 tab 页面的 onShow 主动调用
+   * this.getTabBar().setData({ selected: N }) 来更新 (官方推荐写法)
+   * 这样比 pageLifetimes.show 更可靠, 时机更明确
+   */
+
   methods: {
     /**
      * 根据当前页面路径, 同步高亮对应 tab

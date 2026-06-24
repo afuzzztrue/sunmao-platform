@@ -63,6 +63,10 @@ Page({
   },
 
   onShow: function() {
+    // 同步 custom-tab-bar 高亮 (商城是 tabBar.list[3], 中间 list[2] 是 + 号占位)
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 3 });
+    }
     this.loadProducts();
   },
 

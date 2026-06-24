@@ -102,6 +102,10 @@ Page({
   },
 
   onShow: function() {
+    // 同步 custom-tab-bar 高亮
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 1 });
+    }
     this.filterStructures(this.data.currentTabId);
   },
 

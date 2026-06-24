@@ -34,4 +34,11 @@ public interface LikeRecordMapper extends BaseMapper<LikeRecord> {
             "LIMIT #{limit}")
     List<Map<String, Object>> selectMyLikes(@Param("userId") Integer userId,
                                               @Param("limit") Integer limit);
+
+    /**
+     * 我的点赞 (含真实标题/封面, SQL 在 LikeRecordMapper.xml)
+     * 返回字段: likeId, targetType, targetId, createTime, title, coverImage
+     */
+    List<Map<String, Object>> selectMyLikesEnriched(@Param("userId") Integer userId,
+                                                     @Param("limit") Integer limit);
 }

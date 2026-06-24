@@ -12,6 +12,11 @@ public interface FootprintService extends IService<Footprint> {
 
     List<Footprint> getUserFootprints(Integer userId, Integer limit);
 
+    /**
+     * 6/26 新增: 我的足迹 (含真实标题/封面) - 用于"我的足迹"页面
+     */
+    java.util.List<java.util.Map<String, Object>> myFootprints(Integer userId, Integer limit);
+
     void addFootprint(Integer userId, Integer articleId);
 
     /**
@@ -22,4 +27,9 @@ public interface FootprintService extends IService<Footprint> {
      */
     void addFootprint(Integer userId, Integer articleId,
                       String snapshotTitle, String snapshotCover, String snapshotAuthor);
+
+    /**
+     * 6/26 新增: 通用版本足迹写入 (5 种类型)
+     */
+    void addFootprintV2(Integer userId, Integer targetType, Integer targetId);
 }

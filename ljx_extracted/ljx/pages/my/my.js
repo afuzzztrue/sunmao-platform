@@ -12,6 +12,10 @@ Page({
   },
 
   onShow() {
+    // 同步 custom-tab-bar 高亮
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 4 });
+    }
     this.checkLoginStatus();
     // 处理从 product.js 下单成功后的跳转：自动打开「我的订单」页
     if (app.globalData.pendingTab === 'orders') {
@@ -97,6 +101,7 @@ Page({
   goToWorks: function() { wx.navigateTo({ url: '/pages/works/works' }); },
   goToDownloads: function() { wx.navigateTo({ url: '/pages/downloads/downloads' }); },
   goToLikes: function() { wx.navigateTo({ url: '/pages/likes/likes' }); },
+  goToCollects: function() { wx.navigateTo({ url: '/pages/collects/collects' }); },
   goToHelp: function() { wx.navigateTo({ url: '/pages/help/help' }); },
   goToSupport: function() { wx.navigateTo({ url: '/pages/support/support' }); },
   goToSettings: function() { wx.navigateTo({ url: '/pages/settings/settings' }); },

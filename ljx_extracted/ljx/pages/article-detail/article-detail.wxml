@@ -1,0 +1,91 @@
+<!--pages/article-detail/article-detail.wxml-->
+<!--文章详情页 6/25 新增-->
+
+<view class="page">
+
+  <!-- 加载中 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-icon">⏳</text>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 文章内容 -->
+  <block wx:if="{{!loading && article}}">
+
+    <!-- 封面图 -->
+    <view class="cover-wrapper" wx:if="{{article.coverImage}}">
+      <image class="cover-img" src="{{article.coverImage}}" mode="aspectFill" />
+      <view class="cover-mask"></view>
+    </view>
+
+    <!-- 标题区 -->
+    <view class="title-section">
+      <text class="article-title">{{article.title}}</text>
+      <view class="article-meta">
+        <text class="meta-author">@{{article.userId || '榫卯'}}</text>
+        <text class="meta-divider">·</text>
+        <text class="meta-time">{{article.createTime}}</text>
+      </view>
+    </view>
+
+    <!-- 摘要 -->
+    <view class="summary" wx:if="{{article.summary}}">
+      <text class="summary-text">{{article.summary}}</text>
+    </view>
+
+    <!-- 正文 (HTML 富文本渲染) -->
+    <view class="content">
+      <rich-text class="content-text" nodes="{{article.content}}"></rich-text>
+    </view>
+
+    <!-- 配图 (逗号分隔的多图) -->
+    <view class="images-section" wx:if="{{article.imagesList.length > 0}}">
+      <image
+        class="content-img"
+        wx:for="{{article.imagesList}}"
+        wx:key="*this"
+        src="{{item}}"
+        mode="widthFix"
+        lazy-load="{{true}}"
+        bindtap="onPreviewImage"
+        data-url="{{item}}"
+      />
+    </view>
+
+    <!-- 标签 -->
+    <view class="tags-section" wx:if="{{article.tagsList.length > 0}}">
+      <text class="tag" wx:for="{{article.tagsList}}" wx:key="*this">#{{item}}</text>
+    </view>
+
+    <!-- 统计 -->
+    <view class="stats-section">
+      <text class="stat-item">👁 {{article.viewCount || 0}} 浏览</text>
+      <text class="stat-item">♥ {{article.likeCount || 0}} 点赞</text>
+      <text class="stat-item">★ {{article.collectCount || 0}} 收藏</text>
+    </view>
+
+    <!-- 占位高度 (避免底部操作栏遮挡) -->
+    <view class="bottom-spacer"></view>
+  </block>
+
+  <!-- ========== 底部操作栏 (固定) ========== -->
+  <view class="action-bar" wx:if="{{!loading && article}}">
+    <view class="action-btn" bindtap="onTapComment">
+      <text class="action-icon">💬</text>
+      <text class="action-text">评论</text>
+    </view>
+    <view class="action-btn {{liked ? 'active' : ''}}" bindtap="onTapLike">
+      <text class="action-icon">{{liked ? '❤️' : '🤍'}}</text>
+      <text class="action-text">{{liked ? '已赞' : '点赞'}}</text>
+    </view>
+    <view class="action-btn {{collected ? 'active' : ''}}" bindtap="onTapCollect">
+      <text class="action-icon">{{collected ? '⭐' : '☆'}}</text>
+      <text class="action-text">{{collected ? '已收' : '收藏'}}</text>
+    </view>
+    <button class="share-btn" open-type="share">
+      <text class="action-icon">↗️</text>
+      <text class="action-text">分享</text>
+    </button>
+  </view>
+
+</view>

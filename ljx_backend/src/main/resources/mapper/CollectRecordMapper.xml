@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunmao.ljx.mapper.CollectRecordMapper">
+
+    <!--
+        我的收藏 (含真实标题/封面)
+        target_type: 1=文章 2=帖子 3=课程 4=作品 5=结构
+        6/26 升级: 改用 LEFT JOIN, 字段名加双引号强制大小写
+        兼容老数据: 老 articleId 记录视作 type=1 拼接进结果
+    -->
+    <select id="selectMyCollectsEnriched" resultType="java.util.HashMap">
+        SELECT cr.collect_id  AS "collectId",
+               cr.target_type AS "targetType",
+               cr.target_id   AS "targetId",
+               cr.create_time AS "createTime",
+               COALESCE(
+                   a.title,
+                   a5.title,
+                   SUBSTRING(p_sub.content, 1, 40),
+                   c.title,
+                   w.title,
+                   ''
+               ) AS "title",
+               COALESCE(
+                   a.cover_image,
+                   a5.cover_image,
+                   SUBSTRING_INDEX(p_sub.images, ',', 1),
+                   c.cover_image,
+                   SUBSTRING_INDEX(w.images, ',', 1),
+                   ''
+               ) AS "coverImage"
+          FROM (
+                SELECT collect_id,
+                       IFNULL(target_type, 1) AS target_type,
+                       IFNULL(target_id, article_id) AS target_id,
+                       create_time
+                  FROM collect_record
+                 WHERE user_id = #{userId}
+                   AND (target_id IS NOT NULL OR article_id IS NOT NULL)
+          ) cr
+          LEFT JOIN article a   ON cr.target_type = 1 AND cr.target_id = a.article_id
+          LEFT JOIN article a5  ON cr.target_type = 5 AND cr.target_id = a5.article_id AND a5.category_id = 1
+          LEFT JOIN post p_sub  ON cr.target_type = 2 AND cr.target_id = p_sub.post_id
+          LEFT JOIN course c    ON cr.target_type = 3 AND cr.target_id = c.course_id
+          LEFT JOIN user_work w ON cr.target_type = 4 AND cr.target_id = w.work_id
+         ORDER BY cr.create_time DESC
+         LIMIT #{limit}
+    </select>
+
+</mapper>

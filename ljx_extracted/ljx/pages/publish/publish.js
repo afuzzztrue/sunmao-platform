@@ -168,34 +168,158 @@ Page({
 
   /**
    * 实际发布流程:
-   *   1. 上传所有图片到后端, 拿到 URL 列表
-   *   2. 调 POST /api/article/create 提交表单
-   *   3. 成功后 toast + 返回首页
+   *   1. 收集所有本地图片路径 (封面 + 作品图)
+   *   2. wx.uploadFile × N 上传到 /api/upload, 拿 URL 列表
+   *   3. POST /api/article/create 提交表单 (body 带 URL 列表)
+   *   4. 成功后 Toast + redirectTo 跳到刚发布的详情页
    *
-   * 当前 (前端先做): 第 2 步直接调, 图片用本地路径作为占位
-   *   下一轮补 wx.uploadFile 上传逻辑 + 后端 create 接口
+   * 6/25 接入真实后端
    */
   doPublish(userId) {
     const d = this.data;
-    const payload = {
-      userId: userId,
-      categoryId: d.selectedCategory.id,
-      title: d.title.trim(),
-      summary: d.content.trim().substring(0, 80),
-      content: d.content.trim(),
-      coverImage: d.coverImage,
-      images: d.images,           // TODO: 下一轮上传后改成 URL 数组
-      tags: d.tagsList.join(','),
-      location: ''
-    };
 
-    // TODO 下一轮: POST /api/article/create (当前接口未实现)
-    console.log('发布 payload:', payload);
+    // 1. 收集所有图片
+    const allTempFiles = [];
+    if (d.coverImage) allTempFiles.push(d.coverImage);
+    d.images.forEach(p => allTempFiles.push(p));
 
-    wx.showToast({ title: '后端接口待实现 (下一轮)', icon: 'none' });
-    this.setData({ submitting: false });
+    if (allTempFiles.length === 0) {
+      wx.showToast({ title: '请先选择图片', icon: 'none' });
+      this.setData({ submitting: false });
+      return;
+    }
 
-    // 下一轮: 成功后返回首页
-    // setTimeout(() => wx.switchTab({ url: '/pages/index/index' }), 1500);
+    // 2. 显示上传进度
+    wx.showLoading({
+      title: `上传中 0/${allTempFiles.length}`,
+      mask: true
+    });
+
+    // 3. 顺序上传所有图片
+    this.uploadFilesSequentially(allTempFiles, [])
+      .then(uploadedUrls => {
+        // 3.1 区分封面和作品图
+        const coverUrl = uploadedUrls[0] || '';
+        const imageUrls = uploadedUrls.slice(1);
+
+        // 3.2 拼 payload
+        const payload = {
+          userId: userId,
+          categoryId: d.selectedCategory.id,
+          title: d.title.trim(),
+          summary: d.content.trim().substring(0, 80),
+          content: d.content.trim(),
+          coverImage: coverUrl,
+          images: imageUrls.join(','),  // 逗号分隔
+          tags: d.tagsList.join(','),
+          location: ''
+        };
+
+        console.log('发布 payload:', payload);
+
+        // 3.3 调创建接口
+        return this.requestCreateArticle(payload);
+      })
+      .then(articleId => {
+        wx.hideLoading();
+        wx.showToast({ title: '发布成功', icon: 'success' });
+
+        // 3.4 跳到刚发布的详情页
+        setTimeout(() => {
+          wx.redirectTo({
+            url: '/pages/article-detail/article-detail?id=' + articleId,
+            fail: err => {
+              console.error('跳转详情页失败', err);
+              // 兜底: 跳首页
+              wx.switchTab({ url: '/pages/index/index' });
+            }
+          });
+        }, 1500);
+      })
+      .catch(err => {
+        wx.hideLoading();
+        console.error('发布失败', err);
+        wx.showToast({
+          title: err.message || '发布失败',
+          icon: 'none',
+          duration: 2500
+        });
+      })
+      .finally(() => {
+        this.setData({ submitting: false });
+      });
+  },
+
+  /**
+   * 顺序上传多个文件, 返回 URL 列表
+   * @param {string[]} tempFiles - 本地临时路径数组
+   * @param {string[]} uploadedUrls - 已上传的 URL 数组 (递归用)
+   * @returns {Promise<string[]>} 全部 URL 列表
+   */
+  uploadFilesSequentially(tempFiles, uploadedUrls) {
+    if (tempFiles.length === 0) {
+      return Promise.resolve(uploadedUrls);
+    }
+
+    const [current, ...rest] = tempFiles;
+    const total = uploadedUrls.length + tempFiles.length;
+    const done = uploadedUrls.length + 1;
+
+    // 更新进度
+    wx.showLoading({
+      title: `上传中 ${done}/${total}`,
+      mask: true
+    });
+
+    return new Promise((resolve, reject) => {
+      wx.uploadFile({
+        url: baseUrl + '/api/upload',
+        filePath: current,
+        name: 'files',
+        success: (res) => {
+          try {
+            const data = JSON.parse(res.data);
+            if (data.code === 200 && data.data && data.data.length > 0) {
+              const newUrls = uploadedUrls.concat(data.data);
+              // 递归上传剩余文件
+              this.uploadFilesSequentially(rest, newUrls)
+                .then(resolve)
+                .catch(reject);
+            } else {
+              reject(new Error(data.message || '上传失败'));
+            }
+          } catch (e) {
+            reject(new Error('解析响应失败: ' + e.message));
+          }
+        },
+        fail: (err) => {
+          reject(new Error('网络错误: ' + (err.errMsg || '未知')));
+        }
+      });
+    });
+  },
+
+  /**
+   * 调 POST /api/article/create
+   */
+  requestCreateArticle(payload) {
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: baseUrl + '/api/article/create',
+        method: 'POST',
+        header: { 'content-type': 'application/json' },
+        data: payload,
+        success: (res) => {
+          if (res.data.code === 200 && res.data.data && res.data.data.articleId) {
+            resolve(res.data.data.articleId);
+          } else {
+            reject(new Error(res.data.message || '创建失败'));
+          }
+        },
+        fail: (err) => {
+          reject(new Error('网络错误: ' + (err.errMsg || '未知')));
+        }
+      });
+    });
   }
 });

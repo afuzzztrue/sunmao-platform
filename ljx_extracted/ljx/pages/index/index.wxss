@@ -37,6 +37,8 @@
 
 .tabs-scroll {
   flex: 1;
+  min-width: 0;                /* 关键: flex item 默认 min-width: auto 会阻止收缩, 必须改为 0 才能滚动 */
+  width: 0;                    /* 配合 min-width: 0 让 flex 真正分配剩余宽度 */
   white-space: nowrap;
   height: 88rpx;
 }
@@ -49,6 +51,7 @@
   padding: 0 20rpx;
   height: 88rpx;
   flex-shrink: 0;
+  white-space: nowrap;         /* 防止 tab 文字换行 */
 }
 
 .tab-text {

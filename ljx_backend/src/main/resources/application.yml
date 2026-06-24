@@ -4,6 +4,17 @@ server:
 spring:
   application:
     name: ljx-platform
+  servlet:
+    multipart:
+      # 单文件最大 5MB (与 UploadController.MAX_FILE_SIZE 一致)
+      max-file-size: 5MB
+      # 整个请求最大 50MB (允许 10 张图)
+      max-request-size: 50MB
+      # 内存中超过此大小会写临时文件
+      file-size-threshold: 2MB
+  # 6/26 修复: 移除原 static-path-pattern: /** 配置
+  #   (该配置会拦截所有路径, 包括 /api/*, 导致 500)
+  #   改由 WebMvcConfig 显式 addResourceHandler("/uploads/**")
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -55,3 +66,11 @@ deepseek:
 logging:
   level:
     com.sunmao.ljx.mapper: debug
+
+# 6/26 新增: 文件上传根目录 (绝对路径)
+# 修复问题: Spring Boot 运行工作目录可能在 Temp 下, 相对路径 uploads 会失败
+# 这里固定到 user.dir 下的 uploads 目录, 跨平台都安全
+ljx:
+  upload:
+    # 留空时 fallback 到 user.dir + /uploads
+    dir: ${user.dir}/uploads

@@ -8,14 +8,16 @@ const baseUrl = app.globalData.baseUrl;
 Page({
   data: {
     // 顶部横滑 tab 配置
+    // 6/26 升级: 加 cid 字段 (对应后端 article.category_id), 让切换 tab 时真调后端
+    // 1=结构 2=家具 3=木料 4=历史 5=教程
     topTabs: [
-      { key: 'recommend', label: '推荐', badge: false },
-      { key: 'follow',    label: '关注', badge: false },
-      { key: 'structure', label: '结构', badge: false },
-      { key: 'furniture', label: '家具', badge: false },
-      { key: 'wood',      label: '木料', badge: false },
-      { key: 'tool',      label: '工具', badge: false },
-      { key: 'tutorial',  label: '教程', badge: false }
+      { key: 'recommend', label: '推荐', cid: null },
+      { key: 'follow',    label: '关注', cid: null },
+      { key: 'structure', label: '结构', cid: 1 },
+      { key: 'furniture', label: '家具', cid: 2 },
+      { key: 'wood',      label: '木料', cid: 3 },
+      { key: 'tool',      label: '工具', cid: 5 },
+      { key: 'tutorial',  label: '教程', cid: 5 }
     ],
     currentTab: 'recommend',
 
@@ -40,6 +42,16 @@ Page({
   onLoad: function () {
     this.loadBannerList();
     this.loadArticleList();
+  },
+
+  /**
+   * 同步 custom-tab-bar 高亮 (官方推荐写法)
+   * 解决: custom-tab-bar 共享单例, 切 tab 后 selected 不会自动更新
+   */
+  onShow: function () {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 0 });
+    }
   },
 
   // ========== 原有 API 调用 (完全不动) ==========
@@ -99,8 +111,58 @@ Page({
 
   onSwitchTab(e) {
     const key = e.currentTarget.dataset.key;
+    if (key === this.data.currentTab) return;
     this.setData({ currentTab: key });
-    // TODO: 按 tab key 调用 /api/article/category/{id} 或 /api/article/follow
+
+    const tab = this.data.topTabs.find(t => t.key === key);
+    if (!tab) return;
+
+    // 推荐 / 关注 → 调热门文章接口
+    if (!tab.cid) {
+      this.loadArticleList();
+      return;
+    }
+    // 分类 tab → 调分类接口
+    this.loadArticlesByCategory(tab.cid);
+  },
+
+  /**
+   * 6/26 新增: 按分类加载文章
+   * GET /api/article/category/{categoryId}
+   */
+  loadArticlesByCategory(cid) {
+    wx.showLoading({ title: '加载中...' });
+    wx.request({
+      url: baseUrl + '/api/article/category/' + cid,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.code === 200) {
+          const list = (res.data.data || []).map(this._normalizeArticle);
+          this.setData({
+            articleList: list,
+            loading: false
+          }, () => {
+            this.splitArticleList();
+          });
+        } else {
+          this.setData({ articleList: [] });
+        }
+      },
+      fail: () => this.setData({ articleList: [] }),
+      complete: () => wx.hideLoading()
+    });
+  },
+
+  /**
+   * 6/26 新增: 归一化文章数据 (tags 字符串转数组)
+   */
+  _normalizeArticle(a) {
+    if (a.tags) {
+      a.tagsList = a.tags.split(/[,，]/).map(s => s.trim()).filter(s => s);
+    } else {
+      a.tagsList = [];
+    }
+    return a;
   },
 
   // ========== 搜索浮层 ==========
@@ -145,11 +207,13 @@ Page({
 
   onTapCard(e) {
     const articleId = e.currentTarget.dataset.id;
-    // TODO 下一轮: 新建 pages/article-detail 页面后, 改为:
-    //   wx.navigateTo({ url: '/pages/article-detail/article-detail?id=' + articleId });
-    wx.showToast({
-      title: '详情页开发中 #' + articleId,
-      icon: 'none'
+    // 6/25: 跳详情页 (article-detail 已建好)
+    wx.navigateTo({
+      url: '/pages/article-detail/article-detail?id=' + articleId,
+      fail: err => {
+        console.error('跳转详情页失败', err);
+        wx.showToast({ title: '详情页加载失败', icon: 'none' });
+      }
     });
   },
 
