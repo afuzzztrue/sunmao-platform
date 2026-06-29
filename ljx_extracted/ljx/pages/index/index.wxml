@@ -48,30 +48,7 @@ module.exports = {
     </view>
   </view>
 
-  <!-- ========== 搜索浮层 ========== -->
-  <view class="search-modal {{showSearch ? 'show' : ''}}">
-    <view class="search-modal-mask" bindtap="onCloseSearch"></view>
-    <view class="search-modal-body">
-      <view class="search-bar">
-        <image class="search-icon" src="../images/saearch.png" />
-        <input
-          class="search-input"
-          placeholder="搜索榫卯结构 / 家具 / 教程"
-          placeholder-class="search-placeholder"
-          focus="{{showSearch}}"
-          confirm-type="search"
-          bindconfirm="onSearchConfirm"
-        />
-        <text class="search-cancel" bindtap="onCloseSearch">取消</text>
-      </view>
-      <view class="hot-keywords">
-        <text class="hot-keywords-label">热门搜索</text>
-        <view class="hot-keywords-list">
-          <text class="hot-keyword" wx:for="{{hotKeywords}}" wx:key="*this">{{item}}</text>
-        </view>
-      </view>
-    </view>
-  </view>
+  <!-- 6/29: 搜索浮层已移除, 点击搜索图标直接跳转 global-search 页面 -->
 
   <!-- ========== 轮播图 ========== -->
   <view class="banner-wrapper">

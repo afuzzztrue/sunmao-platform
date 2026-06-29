@@ -30,12 +30,13 @@ var DEMO_COURSES = [
 
 var DEMO_ALL = [].concat(DEMO_FURNITURE, DEMO_WOOD, DEMO_TOOLS, DEMO_COURSES);
 
+// 6/29: category ID 对齐 product 表 (1家具 2木料 3工具 4课程, 0=全部)
 var DEMO_MAP = {};
-DEMO_MAP[2] = DEMO_FURNITURE;
-DEMO_MAP[3] = DEMO_WOOD;
-DEMO_MAP[4] = DEMO_TOOLS;
-DEMO_MAP[5] = DEMO_COURSES;
-DEMO_MAP[1] = DEMO_ALL;
+DEMO_MAP[0] = DEMO_ALL;
+DEMO_MAP[1] = DEMO_FURNITURE;
+DEMO_MAP[2] = DEMO_WOOD;
+DEMO_MAP[3] = DEMO_TOOLS;
+DEMO_MAP[4] = DEMO_COURSES;
 
 function getDemoData(categoryId, keyword) {
   var list = DEMO_MAP[categoryId] || DEMO_ALL;
@@ -50,14 +51,15 @@ function getDemoData(categoryId, keyword) {
 
 Page({
   data: {
+    // 6/29: category ID 对齐 product 表 (0=全部 1=家具 2=木料 3=工具 4=课程)
     categories: [
-      { id: 1, name: '全部' },
-      { id: 2, name: '家具' },
-      { id: 3, name: '木料' },
-      { id: 4, name: '工具' },
-      { id: 5, name: '课程' }
+      { id: 0, name: '全部' },
+      { id: 1, name: '家具' },
+      { id: 2, name: '木料' },
+      { id: 3, name: '工具' },
+      { id: 4, name: '课程' }
     ],
-    currentCat: 1,
+    currentCat: 0,
     productList: [],
     keyword: ''
   },

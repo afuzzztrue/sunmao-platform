@@ -4,71 +4,66 @@
 <mapper namespace="com.sunmao.ljx.mapper.SearchMapper">
 
     <!--
-        全局搜索：5 张表 UNION ALL
-        type 1=文章  2=作品  3=课程  4=帖子  5=结构
-        每个子查询 LIMIT 20 防爆，再在外层 LIMIT 控制总量
+        全局搜索: 5 表 UNION ALL 聚合
+        type: 1=文章 2=作品 3=课程 4=帖子 5=结构(article category_id=1)
+        字段名加双引号保留大小写 (MyBatis HashMap key 需要驼峰)
     -->
     <select id="globalSearch" resultType="java.util.HashMap">
-        SELECT * FROM (
-            SELECT 1 AS type,
-                   article_id AS id,
-                   title,
-                   IFNULL(summary, '') AS `desc`,
-                   IFNULL(cover_image, '') AS image
-              FROM article
-             WHERE status = 1
-               AND title LIKE CONCAT('%', #{kw}, '%')
-             LIMIT 20
-        ) a
+        (SELECT 1 AS "type", a.article_id AS "id", a.title AS "title",
+                a.summary AS "desc", a.cover_image AS "image"
+           FROM article a
+          WHERE a.status = 1
+            AND a.category_id != 1
+            AND (a.title LIKE CONCAT('%', #{kw}, '%')
+              OR a.summary LIKE CONCAT('%', #{kw}, '%')
+              OR a.content LIKE CONCAT('%', #{kw}, '%'))
+          ORDER BY a.create_time DESC
+          LIMIT #{limit})
+
         UNION ALL
-        SELECT * FROM (
-            SELECT 2 AS type,
-                   work_id AS id,
-                   title,
-                   IFNULL(description, '') AS `desc`,
-                   IFNULL(images, '') AS image
-              FROM user_work
-             WHERE status = 1
-               AND title LIKE CONCAT('%', #{kw}, '%')
-             LIMIT 20
-        ) b
+
+        (SELECT 2 AS "type", w.work_id AS "id", w.title AS "title",
+                w.description AS "desc",
+                SUBSTRING_INDEX(w.images, ',', 1) AS "image"
+           FROM user_work w
+          WHERE w.title LIKE CONCAT('%', #{kw}, '%')
+             OR w.description LIKE CONCAT('%', #{kw}, '%')
+          ORDER BY w.create_time DESC
+          LIMIT #{limit})
+
         UNION ALL
-        SELECT * FROM (
-            SELECT 3 AS type,
-                   course_id AS id,
-                   title,
-                   IFNULL(description, '') AS `desc`,
-                   IFNULL(cover_image, '') AS image
-              FROM course
-             WHERE status = 1
-               AND title LIKE CONCAT('%', #{kw}, '%')
-             LIMIT 20
-        ) c
+
+        (SELECT 3 AS "type", c.course_id AS "id", c.title AS "title",
+                c.description AS "desc", c.cover_image AS "image"
+           FROM course c
+          WHERE c.title LIKE CONCAT('%', #{kw}, '%')
+             OR c.description LIKE CONCAT('%', #{kw}, '%')
+          ORDER BY c.create_time DESC
+          LIMIT #{limit})
+
         UNION ALL
-        SELECT * FROM (
-            SELECT 4 AS type,
-                   post_id AS id,
-                   SUBSTRING(content, 1, 40) AS title,
-                   '' AS `desc`,
-                   '' AS image
-              FROM post
-             WHERE status = 1
-               AND content LIKE CONCAT('%', #{kw}, '%')
-             LIMIT 20
-        ) d
+
+        (SELECT 4 AS "type", p.post_id AS "id",
+                SUBSTRING(p.content, 1, 50) AS "title",
+                SUBSTRING(p.content, 1, 100) AS "desc",
+                SUBSTRING_INDEX(p.images, ',', 1) AS "image"
+           FROM post p
+          WHERE p.content LIKE CONCAT('%', #{kw}, '%')
+          ORDER BY p.create_time DESC
+          LIMIT #{limit})
+
         UNION ALL
-        SELECT * FROM (
-            SELECT 5 AS type,
-                   article_id AS id,
-                   title,
-                   '榫卯结构' AS `desc`,
-                   IFNULL(cover_image, '') AS image
-              FROM article
-             WHERE status = 1
-               AND category_id = 1
-               AND title LIKE CONCAT('%', #{kw}, '%')
-             LIMIT 20
-        ) e
-        LIMIT #{limit}
+
+        (SELECT 5 AS "type", a.article_id AS "id", a.title AS "title",
+                a.summary AS "desc", a.cover_image AS "image"
+           FROM article a
+          WHERE a.status = 1
+            AND a.category_id = 1
+            AND (a.title LIKE CONCAT('%', #{kw}, '%')
+              OR a.summary LIKE CONCAT('%', #{kw}, '%')
+              OR a.content LIKE CONCAT('%', #{kw}, '%'))
+          ORDER BY a.create_time DESC
+          LIMIT #{limit})
     </select>
+
 </mapper>

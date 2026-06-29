@@ -16,14 +16,12 @@ Page({
       { key: 'structure', label: '结构', cid: 1 },
       { key: 'furniture', label: '家具', cid: 2 },
       { key: 'wood',      label: '木料', cid: 3 },
-      { key: 'tool',      label: '工具', cid: 5 },
+      { key: 'tool',      label: '工具', cid: 4 },
       { key: 'tutorial',  label: '教程', cid: 5 }
     ],
     currentTab: 'recommend',
 
-    // 搜索浮层
-    showSearch: false,
-    hotKeywords: ['明式家具', '燕尾榫', '紫檀', '官帽椅', '明式圈椅'],
+    // 6/29: 搜索浮层已移除, 改为直接跳转 global-search 页面
 
     // 轮播图
     bannerList: [],
@@ -203,26 +201,17 @@ Page({
     return a;
   },
 
-  // ========== 搜索浮层 ==========
+  // ========== 搜索 ==========
 
+  // 6/29: 点击搜索图标直接跳转到搜索页, 不再弹内联浮层
   onTapSearch() {
-    this.setData({ showSearch: true });
-  },
-
-  onCloseSearch() {
-    this.setData({ showSearch: false });
-  },
-
-  onSearchConfirm(e) {
-    const keyword = e.detail.value;
-    if (!keyword || !keyword.trim()) {
-      wx.showToast({ title: '请输入搜索词', icon: 'none' });
-      return;
-    }
     wx.navigateTo({
-      url: '/pages/global-search/global-search?keyword=' + encodeURIComponent(keyword)
+      url: '/pages/global-search/global-search',
+      fail: err => {
+        console.error('跳转搜索页失败', err);
+        wx.showToast({ title: '搜索页加载失败', icon: 'none' });
+      }
     });
-    this.setData({ showSearch: false });
   },
 
   // ========== 侧边菜单 (占位) ==========

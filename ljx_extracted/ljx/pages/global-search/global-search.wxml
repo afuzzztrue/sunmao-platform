@@ -1,61 +1,67 @@
-<view class="container">
-  <view class="search-bar">
-    <view class="search-input-wrap">
+<!--pages/global-search/global-search.wxml-->
+<!--全局搜索页 6/29 新建-->
+
+<view class="page">
+
+  <!-- 顶部搜索栏 -->
+  <view class="search-header">
+    <view class="search-bar">
       <text class="search-icon">🔍</text>
       <input
         class="search-input"
-        placeholder="搜索榫卯、课程、商品、作品..."
-        placeholder-class="search-placeholder-class"
+        placeholder="搜索榫卯结构 / 家具 / 教程"
+        placeholder-class="search-placeholder"
         value="{{keyword}}"
-        bindinput="onSearchInput"
-        bindconfirm="onSearchConfirm"
         confirm-type="search"
-        focus="{{true}}"
+        bindinput="onInput"
+        bindconfirm="onSearch"
       />
-      <view class="search-clear" wx:if="{{keyword}}" bindtap="clearKeyword">✕</view>
-    </view>
-    <text class="search-cancel" bindtap="onCancel">取消</text>
-  </view>
-
-  <view class="search-section" wx:if="{{!keyword}}">
-    <view class="section-title-row">
-      <text class="section-title-text">历史搜索</text>
-      <text class="section-action" bindtap="clearHistory">🗑 清空</text>
-    </view>
-    <view class="tag-list">
-      <view class="tag" wx:for="{{history}}" wx:key="*this" bindtap="onTapTag" data-text="{{item}}">{{item}}</view>
-      <view class="tag tag-empty" wx:if="{{!history.length}}">暂无搜索记录</view>
+      <text class="search-btn-text" bindtap="onSearch">搜索</text>
     </view>
   </view>
 
-  <view class="search-section" wx:if="{{!keyword}}">
-    <view class="section-title-row"><text class="section-title-text">热门搜索</text></view>
-    <view class="tag-list">
-      <view class="tag hot" wx:for="{{hotList}}" wx:key="*this" bindtap="onTapTag" data-text="{{item}}">
-        <text class="hot-rank">{{idx+1 < 10 ? '0'+(idx+1) : idx+1}}</text>
-        {{item}}
+  <!-- 热门搜索 (未搜索时显示) -->
+  <view class="hot-section" wx:if="{{!searched}}">
+    <text class="hot-label">热门搜索</text>
+    <view class="hot-list">
+      <text class="hot-tag" wx:for="{{hotKeywords}}" wx:key="*this"
+            data-kw="{{item}}" bindtap="onTapHotKeyword">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view class="results-section" wx:if="{{searched}}">
+    <view class="results-count" wx:if="{{results.length > 0}}">
+      <text>找到 {{results.length}} 条结果</text>
+    </view>
+
+    <view class="result-card" wx:for="{{results}}" wx:key="index"
+          data-type="{{item.type}}" data-id="{{item.typeId}}"
+          bindtap="onTapResult" hover-class="card-hover">
+      <image class="result-img" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}" />
+      <view class="result-img-placeholder" wx:else>
+        <text class="placeholder-text">无图</text>
       </view>
-    </view>
-  </view>
-
-  <view class="result-tip" wx:if="{{keyword}}">
-    找到 <text class="result-count">{{resultList.length}}</text> 个匹配结果
-  </view>
-
-  <view class="result-list" wx:if="{{keyword && resultList.length}}">
-    <view class="result-card" wx:for="{{resultList}}" wx:key="id" bindtap="onTapResult" data-type="{{item.type}}" data-id="{{item.id}}">
-      <view class="result-type">{{typeMap[item.type]}}</view>
-      <image class="result-img" src="{{item.image}}" mode="aspectFill" />
       <view class="result-info">
-        <text class="result-title">{{item.title}}</text>
-        <text class="result-desc">{{item.desc}}</text>
+        <view class="result-title-row">
+          <text class="result-type type-{{item.type}}">{{item.typeName}}</text>
+          <text class="result-title">{{item.title}}</text>
+        </view>
+        <text class="result-desc" wx:if="{{item.desc}}">{{item.desc}}</text>
       </view>
+    </view>
+
+    <!-- 空结果 -->
+    <view class="empty-state" wx:if="{{!loading && results.length === 0}}">
+      <text class="empty-icon">🔍</text>
+      <text class="empty-text">未找到相关内容</text>
+      <text class="empty-sub">试试其他关键词</text>
     </view>
   </view>
 
-  <view class="empty" wx:if="{{keyword && !resultList.length}}">
-    <text class="empty-icon">🔍</text>
-    <text class="empty-text">未找到相关内容</text>
-    <text class="empty-sub">试试「圈椅」「紫檀」「入门30天」等关键词</text>
+  <!-- 加载中 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">搜索中...</text>
   </view>
+
 </view>

@@ -24,9 +24,10 @@ public class ProductController {
     private ProductOrderMapper productOrderMapper;
 
     @GetMapping("/list")
-    public Result<List<Product>> list(@RequestParam(defaultValue = "1") Integer categoryId) {
+    public Result<List<Product>> list(@RequestParam(defaultValue = "0") Integer categoryId) {
         List<Product> list;
-        if (categoryId == 1) {
+        // 6/29: categoryId=0 表示"全部", 不按分类过滤
+        if (categoryId == null || categoryId == 0) {
             list = productService.list(new LambdaQueryWrapper<Product>()
                     .eq(Product::getStatus, 1)
                     .orderByDesc(Product::getCreateTime));

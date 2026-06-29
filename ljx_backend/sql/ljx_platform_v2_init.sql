@@ -443,7 +443,7 @@ INSERT INTO `category` (`name`, `parent_id`, `sort_order`, `icon`, `description`
 ('结构', 0, 1, '../images/结构-1.png', '榫卯结构相关内容',     1),
 ('家具', 0, 2, '../images/家具-1.png', '传统家具相关内容',     1),
 ('木料', 0, 3, '../images/紫檀木.png', '木料材质相关内容',     1),
-('历史', 0, 4, '../images/唐代.png',   '榫卯历史相关内容',     1),
+('工具', 0, 4, '../images/tool-set.png', '工具相关内容',       1),
 ('教程', 0, 5, '../images/入门.png',   '制作教程相关内容',     1);
 
 

@@ -1,104 +1,94 @@
+// pages/global-search/global-search.js
+// 全局搜索页 (6/29 新建)
+// 调后端 GET /api/search/global?keyword=xxx&limit=30
+// 跨 5 表: 文章/作品/课程/帖子/结构
+
 const app = getApp();
-const KEY_HISTORY = 'globalSearchHistory';
-const MAX_HISTORY = 10;
 
 Page({
   data: {
     keyword: '',
-    history: [],
-    hotList: ['明式圈椅', '小叶紫檀', '半隐燕尾榫', '入门30天', '明式家具复制', '抱肩榫', '日式平刨'],
-    resultList: [],
-    typeMap: { 1: '商品', 2: '作品', 3: '课程', 4: '帖子', 5: '结构' },
-    loading: false
+    results: [],
+    loading: false,
+    searched: false,
+    hotKeywords: ['明式家具', '燕尾榫', '紫檀', '官帽椅', '明式圈椅', '榫卯']
   },
 
-  onLoad() { this.loadHistory(); },
-
-  loadHistory: function() {
-    try {
-      var h = wx.getStorageSync(KEY_HISTORY) || [];
-      this.setData({ history: h });
-    } catch (e) { this.setData({ history: [] }); }
+  onLoad(options) {
+    if (options.keyword) {
+      this.setData({ keyword: decodeURIComponent(options.keyword) });
+      this.doSearch();
+    }
   },
 
-  saveHistory: function(kw) {
-    if (!kw) return;
-    var h = (wx.getStorageSync(KEY_HISTORY) || []).filter(function(x) { return x !== kw; });
-    h.unshift(kw);
-    if (h.length > MAX_HISTORY) h = h.slice(0, MAX_HISTORY);
-    wx.setStorageSync(KEY_HISTORY, h);
-    this.setData({ history: h });
+  onInput(e) {
+    this.setData({ keyword: e.detail.value });
   },
 
-  onInput: function(e) { this.setData({ keyword: e.detail.value }); },
-  onConfirm: function(e) { this.doSearch(e.detail.value); },
+  onSearch() {
+    this.doSearch();
+  },
 
-  onTapHot: function(e) {
-    var kw = e.currentTarget.dataset.kw;
+  onTapHotKeyword(e) {
+    const kw = e.currentTarget.dataset.kw;
     this.setData({ keyword: kw });
-    this.doSearch(kw);
+    this.doSearch();
   },
 
-  onTapHistory: function(e) {
-    var kw = e.currentTarget.dataset.kw;
-    this.setData({ keyword: kw });
-    this.doSearch(kw);
-  },
-
-  onClearHistory: function() {
-    wx.removeStorageSync(KEY_HISTORY);
-    this.setData({ history: [] });
-  },
-
-  onClearInput: function() {
-    this.setData({ keyword: '', resultList: [] });
-  },
-
-  /**
-   * 调用后端 GET /api/search/global?keyword=&limit=30
-   * 后端返回 [{type, id, title, desc, image}]
-   *   type 1=商品 2=作品 3=课程 4=帖子 5=结构
-   */
-  doSearch: function(kw) {
-    kw = (kw || this.data.keyword || '').trim();
-    if (!kw) return;
-    this.setData({ keyword: kw, loading: true });
-    var that = this;
+  doSearch() {
+    const kw = (this.data.keyword || '').trim();
+    if (!kw) {
+      wx.showToast({ title: '请输入搜索词', icon: 'none' });
+      return;
+    }
+    this.setData({ loading: true, searched: true });
     wx.request({
       url: app.globalData.baseUrl + '/api/search/global',
       method: 'GET',
       data: { keyword: kw, limit: 30 },
-      header: { 'Authorization': wx.getStorageSync('token') || '' },
-      success: function(res) {
+      success: (res) => {
         if (res.data.code === 200) {
-          that.setData({ resultList: res.data.data || [] });
-          that.saveHistory(kw);
+          const list = (res.data.data || []).map(o => {
+            var img = o.image || '';
+            if (img && img.indexOf('/uploads/') === 0) {
+              img = app.globalData.baseUrl + img;
+            }
+            return {
+              type: o.type,
+              typeId: o.id,
+              title: o.title || '',
+              desc: o.desc || '',
+              image: img,
+              typeName: this._typeLabel(o.type)
+            };
+          });
+          this.setData({ results: list });
         } else {
-          that.setData({ resultList: [] });
+          this.setData({ results: [] });
         }
       },
-      fail: function() { that.setData({ resultList: [] }); },
-      complete: function() { that.setData({ loading: false }); }
+      fail: () => {
+        wx.showToast({ title: '搜索失败', icon: 'none' });
+        this.setData({ results: [] });
+      },
+      complete: () => this.setData({ loading: false })
     });
   },
 
-  /**
-   * 根据命中类型路由到对应详情页
-   * type 1商品 → product  2作品 → works  3课程 → sort
-   *     4帖子 → place      5结构 → sort
-   */
-  onTapResult: function(e) {
-    var type = parseInt(e.currentTarget.dataset.type, 10);
-    var id = e.currentTarget.dataset.id;
-    switch (type) {
-      case 1: wx.navigateTo({ url: '/pages/product/product?id=' + id }); break;
-      case 2: wx.navigateTo({ url: '/pages/works/works' }); break;
-      case 3: wx.switchTab({ url: '/pages/sort/sort' }); break;
-      case 4: wx.navigateTo({ url: '/pages/place/place' }); break;
-      case 5: wx.switchTab({ url: '/pages/sort/sort' }); break;
-      default: wx.showToast({ title: '暂不支持的类别', icon: 'none' });
-    }
+  _typeLabel(t) {
+    const map = { 1: '文章', 2: '作品', 3: '课程', 4: '帖子', 5: '结构' };
+    return map[t] || '未知';
   },
 
-  goBack: function() { wx.navigateBack(); }
+  onTapResult(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: '/pages/article-detail/article-detail?id=' + id,
+      fail: () => wx.showToast({ title: '详情页暂未实现', icon: 'none' })
+    });
+  },
+
+  goBack() {
+    wx.navigateBack();
+  }
 });
