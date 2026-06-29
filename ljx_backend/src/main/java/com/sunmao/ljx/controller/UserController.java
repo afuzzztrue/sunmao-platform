@@ -24,11 +24,10 @@ public class UserController {
     private FollowService followService;
 
     @PostMapping("/register")
-    public Result<User> register(@RequestParam String account,
+    public Result<User> register(@RequestParam String phone,
+                                  @RequestParam String email,
                                   @RequestParam String password,
                                   @RequestParam String nickname) {
-        String phone = account.contains("@") ? null : account;
-        String email = account.contains("@") ? account : null;
         User user = userService.register(phone, email, password, nickname);
         return Result.success(user);
     }

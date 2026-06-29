@@ -1,159 +1,149 @@
 /* pages/login/login.wxss */
-.login-container {
+/* 登录页样式 6/29 新建 */
+
+.page {
+  background: #F5F0E8;
+  min-height: 100vh;
+  padding-bottom: 60rpx;
+}
+
+/* ========== 顶部装饰 ========== */
+.header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 100rpx 56rpx 80rpx;
-  background: #F5F0E8;
-  min-height: 100vh;
-  box-sizing: border-box;
+  padding: 80rpx 0 40rpx;
 }
 
-.ornament {
+.logo-circle {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: #3E2723;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 56rpx;
+  margin-bottom: 20rpx;
 }
 
-.ornament-line {
-  width: 72rpx;
-  height: 2rpx;
-  background: #D4A45A;
-  opacity: 0.45;
-}
-
-.ornament-diamond {
-  width: 18rpx;
-  height: 18rpx;
-  background: #D4A45A;
-  transform: rotate(45deg);
-  opacity: 0.55;
-  margin: 0 20rpx;
-  border-radius: 2rpx;
+.logo-text {
+  font-size: 56rpx;
+  color: #F5F0E8;
+  font-weight: bold;
 }
 
 .title {
-  font-size: 56rpx;
-  font-weight: 700;
+  font-size: 40rpx;
+  font-weight: bold;
   color: #3E2723;
-  text-align: center;
-  line-height: 1.3;
-  margin-bottom: 12rpx;
-  letter-spacing: 6rpx;
+  margin-bottom: 10rpx;
 }
 
 .subtitle {
-  font-size: 28rpx;
-  color: #6B5E55;
-  text-align: center;
-  margin-bottom: 80rpx;
+  font-size: 26rpx;
+  color: #999;
 }
 
+/* ========== 表单 ========== */
 .form {
-  width: 100%;
-  margin-bottom: 40rpx;
+  padding: 20rpx 48rpx;
 }
 
-.input-wrapper {
-  margin-bottom: 24rpx;
-  height: 96rpx;
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  border: 2rpx solid transparent;
-  box-shadow: 0 4rpx 16rpx rgba(62,39,35,0.08);
-  box-sizing: border-box;
+.field {
   display: flex;
   align-items: center;
-  padding: 0 36rpx;
+  background: #FFF;
+  border-radius: 16rpx;
+  padding: 0 28rpx;
+  height: 96rpx;
+  margin-bottom: 8rpx;
+  border: 2rpx solid transparent;
+  transition: border-color 0.2s;
 }
 
-.input-wrapper-focus {
-  border-color: #D4A45A;
-  box-shadow: 0 4rpx 16rpx rgba(62,39,35,0.12);
+.field.error {
+  border-color: #E53935;
 }
 
-.input {
+.field.valid {
+  border-color: #43A047;
+}
+
+.field-label {
+  font-size: 28rpx;
+  color: #6B5B4F;
+  width: 100rpx;
+  flex-shrink: 0;
+}
+
+.field-input {
   flex: 1;
-  width: 100%;
+  height: 96rpx;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.placeholder {
+  color: #CCC;
+  font-size: 28rpx;
+}
+
+.field-icon {
+  font-size: 36rpx;
+  color: #43A047;
+  margin-left: 12rpx;
+}
+
+.field-tip {
+  display: block;
+  font-size: 24rpx;
+  margin-bottom: 16rpx;
+  padding-left: 28rpx;
+}
+
+.error-tip {
+  color: #E53935;
+}
+
+.hint-tip {
+  color: #999;
+}
+
+/* ========== 提交按钮 ========== */
+.submit-btn {
+  margin-top: 40rpx;
   height: 96rpx;
   line-height: 96rpx;
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font-size: 30rpx;
-  color: #1A1A1A;
-  box-shadow: none;
-  box-sizing: border-box;
-}
-
-.input:focus {
-  border: none;
-  box-shadow: none;
-}
-
-.btn-login {
-  width: 100%;
-  background-image: linear-gradient(135deg, #3E2723, #5D4037);
-  color: #FFFFFF;
-  border-radius: 9999rpx;
-  padding: 30rpx;
-  font-size: 34rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
   font-weight: 600;
-  margin-bottom: 44rpx;
-  border: none;
-  box-shadow: 0 8rpx 28rpx rgba(62,39,35,0.28);
-  letter-spacing: 4rpx;
-}
-
-.btn-login.disabled {
-  background-image: linear-gradient(135deg, #BDBDBD, #9E9E9E);
-  box-shadow: none;
-  color: #FFFFFF;
-}
-
-.btn-login::after {
+  background: #D5C8B8;
+  color: #999;
+  text-align: center;
   border: none;
 }
 
-.footer {
+.submit-btn.active {
+  background: #3E2723;
+  color: #FFF;
+}
+
+.submit-btn[disabled] {
+  opacity: 0.7;
+}
+
+/* ========== 底部链接 ========== */
+.bottom-link {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.text {
+  margin-top: 30rpx;
   font-size: 28rpx;
-  color: #6B5E55;
+  color: #999;
 }
 
 .link {
-  font-size: 28rpx;
-  color: #D4A45A;
+  color: #3E2723;
+  font-weight: 600;
   margin-left: 8rpx;
-  font-weight: 600;
-}
-
-.test-tip {
-  background: rgba(212, 164, 90, 0.10);
-  border-radius: 20rpx;
-  padding: 28rpx 44rpx;
-  margin-top: 72rpx;
-  text-align: center;
-  border: 1rpx solid rgba(212, 164, 90, 0.18);
-}
-
-.tip-title {
-  display: block;
-  font-size: 26rpx;
-  color: #D4A45A;
-  font-weight: 600;
-  margin-bottom: 8rpx;
-}
-
-.tip-content {
-  display: block;
-  font-size: 24rpx;
-  color: #6B5E55;
 }

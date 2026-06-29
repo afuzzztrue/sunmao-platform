@@ -1,24 +1,30 @@
 -- ================================================================
--- 榫卯非遗文化传承平台 - 完整数据库初始化脚本 v2.1
+-- 榫卯非遗文化传承平台 - 完整数据库初始化脚本 v3.0
 -- --------------------------------------------------------------
--- 版本:       v2.1 (2026-06-26 整合版, 含 6 个问题修复)
+-- 版本:       v3.0 (2026-06-29 整合版, 含全部 4 轮 bug 修复)
 -- 适用数据库:  MySQL 8.0+ (已用 8.0.46 测试)
 -- 端口:        3307
 -- 字符集:      utf8mb4 / utf8mb4_unicode_ci
 -- 存储引擎:    InnoDB
 -- --------------------------------------------------------------
--- 整合来源 (全部已并入此文件, 旧文件归档到 sql/archive/):
+-- 整合来源 (全部已并入此文件, 旧文件可删除):
 --   1. init_database.sql                                  (14 张原表)
 --   2. seed_products.sql                                  (15 条商品)
 --   3. migrations/2026-06-10-my-tabs-backend-integration  (feedback + 偏好 + 快照)
---   4. schema_mysql8_full.sql v1.0                       (商城 2 张表)
---   5. seed_articles_admin1.sql                          (admin1 + 12 article + 12 work)
---   6. migrations/2026-06-26-fix-4-issues                (collect/footprint 加 target_type + target_id)
+--   4. schema_mysql8_full.sql v1.0                        (商城 2 张表)
+--   5. seed_articles_admin1.sql                           (admin1 + 12 article + 12 work)
+--   6. migrations/2026-06-26-fix-4-issues                 (collect/footprint 加 target_type + target_id)
+--   7. migrations/2026-06-29-rename-history-to-tool       (category_id=4 历史→工具)
 -- --------------------------------------------------------------
 -- 表总数: 17 张
 --   user, sys_config, category, banner, article, post,
 --   like_record, comment, collect_record, follow, footprint,
 --   course, course_download, user_work, product, product_order, feedback
+-- --------------------------------------------------------------
+-- v3.0 变更 (2026-06-29):
+--   * category_id=4 从"历史"改名为"工具" (首页工具 tab 对齐)
+--   * user 表 phone/email 已有唯一约束 (注册页手机号+邮箱分离)
+--   * collect_record / footprint 多态字段已内置 (无需再跑迁移)
 -- --------------------------------------------------------------
 -- v2.1 变更 (2026-06-26):
 --   * collect_record 加 target_type + target_id 列, article_id 改为可空 (兼容老数据)
@@ -26,13 +32,13 @@
 --   * collect_record 去掉 uk_collect_user_article 唯一约束 (改为普通索引, 支持多态收藏)
 -- --------------------------------------------------------------
 -- 种子数据:
---   1 个 admin1 管理员用户
---   5 个内容分类
+--   1 个 admin1 管理员用户 (手机号 13800000001 / 邮箱 admin1@sunmao.com / 密码 admin123)
+--   5 个内容分类 (结构/家具/木料/工具/教程)
 --   4 张首页轮播图
 --   5 条系统配置
---   12 篇文章 (admin1 发布)
+--   12 篇文章 (admin1 发布, 覆盖 5 个分类)
 --   12 条用户作品 (admin1 发布)
---   15 件商城商品
+--   15 件商城商品 (4 家具 + 5 木料 + 3 工具 + 3 课程)
 -- --------------------------------------------------------------
 -- 执行方式:
 --   1. 命令行: mysql -uroot -p12345 -P3307 < ljx_platform_v2_init.sql

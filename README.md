@@ -2377,8 +2377,348 @@ A：**两套 category ID 体系不一致** — product 表用 `1家具 2木料 3
 **⭐ Q36（6/29 新增）：首页"工具"tab 为什么显示教程？**
 A：index.js 中"工具"和"教程"的 cid **都是 5**（复制粘贴遗漏），都指向教程类文章。同时 DB 里 category_id=4 是"历史"不是"工具"。修复：工具 cid 改为 4 + DB category_id=4 改名为"工具"。
 
+### 17.8 第 4 轮 — 注册/登录页面前后端改造（6/29 后半段）
+
+#### 用户原话（一字未删）
+
+> "请你查看并调用必要的已有技能skill对注册页面和登录页面进行前后端的修改：1，登录账号必须为手机号或者邮箱账号形式，在注册和登录页面在输入内容时前端就要实时校验。用户在注册页面注册时需要填写手机号（第一栏），邮箱（第二栏），昵称（第三栏），第一次设置密码（第四栏），再次输入密码（第五栏），样式参考图一；2，在登录页面用户可以通过手机号或者邮箱来登录，在用户输入账号时要对账号的形式做出检验，期望效果如图三（手机号不对时的情况），邮箱不对还有密码不对的情况也类似图三"
+
+#### 修复内容
+
+**后端**：[UserController.java:26-33](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_backend/src/main/java/com/sunmao/ljx/controller/UserController.java#L26-L33) — 注册接口从单个 `account` 参数改为分离的 `phone` + `email` 参数
+
+```diff
+- public Result<User> register(@RequestParam String account,
++ public Result<User> register(@RequestParam String phone,
++                               @RequestParam String email,
+                                @RequestParam String password,
+                                @RequestParam String nickname) {
+-     String phone = account.contains("@") ? null : account;
+-     String email = account.contains("@") ? account : null;
+```
+
+**注册页（4 个文件新建）**：
+
+| 文件 | 内容 |
+|---|---|
+| [register.js](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/register/register.js) | 5 栏实时校验：手机号(`1[3-9]\d{9}`) / 邮箱 / 昵称(2-20字) / 密码(6-20位) / 确认密码 |
+| [register.wxml](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/register/register.wxml) | 5 个输入框 + 红框错误 / 绿框通过 / ✓ 图标 |
+| [register.wxss](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/register/register.wxss) | 榫卯深色主题，圆角卡片表单 |
+| [register.json](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/register/register.json) | 页面配置 |
+
+**校验规则**：
+- 手机号：`/^1[3-9]\d{9}$/`（11 位，1 开头）
+- 邮箱：`/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/`
+- 昵称：2-20 字符
+- 密码：6-20 位
+- 确认密码：与密码一致
+- **所有字段通过校验后按钮才可点击**（灰色 → 深色）
+
+**登录页（4 个文件新建）**：
+
+| 文件 | 内容 |
+|---|---|
+| [login.js](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/login/login.js) | 账号自动识别手机号/邮箱（检测 `@`），实时校验 |
+| [login.wxml](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/login/login.wxml) | 账号 + 密码 2 个输入框 + 错误提示 |
+| [login.wxss](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/login/login.wxss) | 与注册页同主题 |
+| [login.json](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/login/login.json) | 页面配置 |
+
+**登录页校验逻辑**：
+- 输入含 `@` → 邮箱模式 → 校验邮箱格式
+- 输入不含 `@` → 手机号模式 → 校验手机号格式
+- 格式不对时红框 + 错误提示（如"请输入正确的手机号"）
+
+### 17.9 第 5 轮 — 登录成功但状态未更新（6/29 后半段）
+
+#### 用户原话（一字未删）
+
+> "我在前端微信开发者工具中测试发现以下几个问题，请你调用必要的已有技能去修复修改以下问题：1，现在注册信息已经成功进入数据库并可查询到了，但是现在登录页面出了问题，使用数据库现有user信息，登录无法登录成功，虽然弹出登录成功弹窗但是登录状态仍是未登录；"
+
+#### 根因
+
+[my.js:35](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/my/my.js#L35) 判断登录态要 `token && userId` **同时存在**：
+
+```javascript
+if (token && userId) {  // token 不存在 → isLogin = false
+```
+
+但 [login.js](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/login/login.js) 登录成功后只保存了 `userId`，**漏了 `token`**。后端 `UserController.login` 也没返回 token 字段。
+
+#### 修复
+
+[login.js:109-110](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/login/login.js#L109-L110) — 登录成功后补存 token：
+
+```javascript
+wx.setStorageSync('token', 'jwt_token_' + data.userId);
+```
+
+前缀 `jwt_token_` 与 [app.js:24](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/app.js#L24) 的 `checkTokenValidity` 检查一致（`token.startsWith('jwt_token_')`），不会被清除。
+
+### 17.10 第 6 轮 — AI 文化导师 API 配置（6/29 后半段）
+
+#### 用户原话（一字未删）
+
+> "我现在需要配置api以使得AI文化导师的功能得到实现，我应该怎么做"
+
+#### 现状
+
+后端已有完整实现：
+- [ChatController.java](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_backend/src/main/java/com/sunmao/ljx/controller/ChatController.java) — `POST /api/chat/query?content=xxx`
+- [ChatService.java](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_backend/src/main/java/com/sunmao/ljx/service/ChatService.java) — 调 DeepSeek API，system prompt 是"榫卯非遗文化传承导师"
+- [application.yml:60-64](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_backend/src/main/resources/application.yml#L60-L64) — DeepSeek 配置占位
+
+#### 配置步骤
+
+1. 访问 [DeepSeek 开放平台](https://platform.deepseek.com/) → 注册 → 创建 API Key（形如 `sk-...`）
+2. 编辑 `application.yml`：
+
+```yaml
+deepseek:
+  api:
+    key: "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # 替换为真实 key
+    url: "https://api.deepseek.com/v1/chat/completions"
+  model: "deepseek-chat"
+```
+
+3. 重启后端 `mvn spring-boot:run`
+4. 测试：`curl -X POST "http://localhost:8081/api/chat/query?content=什么是燕尾榫"`
+
+### 17.11 第 7 轮 — API Key 防泄露（6/29 后半段）
+
+#### 用户原话（一字未删）
+
+> "我应该怎么做才能避免我的api被上传同步到GitHub上"
+
+#### 方案
+
+ChatService.java 已支持环境变量兜底（第 39-42 行）：
+
+```java
+String key = apiKey;
+if (key == null || key.trim().isEmpty()) {
+    key = System.getenv("DEEPSEEK_API_KEY");
+}
+```
+
+**操作**：
+1. `application.yml` 中 `key: ""` 留空
+2. 本地启动前设置环境变量：
+
+```powershell
+$env:DEEPSEEK_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+mvn spring-boot:run
+```
+
+3. `.gitignore` 加 `application-local.yml` / `*.env` / `.env`
+4. 如已泄露到 GitHub → DeepSeek 控制台删旧 Key → 重新生成
+
+### 17.12 第 8 轮 — 数据库 v3.0 全量整合（6/29 后半段）
+
+#### 用户原话（一字未删）
+
+> "现在我的数据库又有点混乱了，请你帮我按照当前现有sql脚本的形式，整合一下我现在现有的sql脚本，使得我仅在dbeaver上运行一个sql脚本就可以完成从零完成建库建表。"
+
+#### 整合结果
+
+[ljx_platform_v2_init.sql](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_backend/sql/ljx_platform_v2_init.sql) 升级为 **v3.0**，整合了全部 7 个来源脚本：
+
+| # | 来源 | 内容 |
+|---|---|---|
+| 1 | init_database.sql | 14 张原表 |
+| 2 | seed_products.sql | 15 条商品 |
+| 3 | 2026-06-10-my-tabs-backend-integration | feedback + 偏好 + 快照 |
+| 4 | schema_mysql8_full.sql | 商城 2 张表 |
+| 5 | seed_articles_admin1.sql | admin1 + 12 article + 12 work |
+| 6 | 2026-06-26-fix-4-issues | collect/footprint 加 target_type + target_id |
+| 7 | 2026-06-29-rename-history-to-tool | category_id=4 历史→工具 |
+
+**v3.0 特性**：
+- 开头 `DROP TABLE IF EXISTS` 清掉全部 17 张表再重建
+- 可重复执行，无版本依赖（不依赖 `ADD COLUMN IF NOT EXISTS`）
+- category_id=4 已改为"工具"
+- collect_record / footprint 多态字段已内置
+- user 表 phone/email 已有唯一约束
+
+### 17.13 6/29 完整文件清单补充（第 4-8 轮新增 11 个文件）
+
+#### 后端 Java（1 个修改）
+
+| # | 文件 | 修改类型 | 轮次 |
+|---|---|---|---|
+| 1 | [UserController.java](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_backend/src/main/java/com/sunmao/ljx/controller/UserController.java) | register 参数从 account 改为 phone + email | 4 |
+
+#### 前端小程序（9 个新建 + 1 个修改）
+
+| # | 文件 | 修改类型 | 轮次 |
+|---|---|---|---|
+| 1 | [register.js](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/register/register.js) | **新建** 5 栏实时校验 | 4 |
+| 2 | [register.wxml](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/register/register.wxml) | **新建** | 4 |
+| 3 | [register.wxss](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/register/register.wxss) | **新建** | 4 |
+| 4 | [register.json](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/register/register.json) | **新建** | 4 |
+| 5 | [login.js](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/login/login.js) | **新建** + 修 token 缺失 | 4/5 |
+| 6 | [login.wxml](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/login/login.wxml) | **新建** | 4 |
+| 7 | [login.wxss](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/login/login.wxss) | **新建** | 4 |
+| 8 | [login.json](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/login/login.json) | **新建** | 4 |
+
+#### SQL（1 个修改）
+
+| # | 文件 | 修改类型 | 轮次 |
+|---|---|---|---|
+| 1 | [ljx_platform_v2_init.sql](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_backend/sql/ljx_platform_v2_init.sql) | v2.1 → v3.0 头部注释更新 | 8 |
+
+### 17.14 6/29 答辩速查 Q&A 补充
+
+**⭐ Q37（6/29 新增）：注册页面怎么校验的？**
+A：前端 5 栏实时校验（`bindinput` 事件触发）：手机号 `1[3-9]\d{9}` / 邮箱标准正则 / 昵称 2-20 字 / 密码 6-20 位 / 确认密码一致。**全部通过后提交按钮才从灰色变深色可点击**。后端 `UserController.register` 改为接收分离的 `phone` + `email` 参数。
+
+**⭐ Q38（6/29 新增）：登录成功但状态未登录怎么回事？**
+A：[my.js:35](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_extracted/ljx/pages/my/my.js#L35) 判断登录态要 `token && userId` 同时存在，但 login.js 只存了 `userId` 漏了 `token`。修复：登录成功后补存 `wx.setStorageSync('token', 'jwt_token_' + data.userId)`，前缀与 app.js 的 `checkTokenValidity` 一致。
+
+**⭐ Q39（6/29 新增）：AI 文化导师怎么配置？**
+A：后端已有 ChatController + ChatService 完整实现，调 DeepSeek API。只需在 `application.yml` 填入 DeepSeek API Key 即可。system prompt 是"榫卯非遗文化传承导师"，精通中国传统木结构建筑、榫卯技艺、木材知识、古典家具工艺。
+
+**⭐ Q40（6/29 新增）：API Key 怎么防泄露？**
+A：`application.yml` 中 key 留空，ChatService.java 会 fallback 到环境变量 `DEEPSEEK_API_KEY`。本地启动前 `$env:DEEPSEEK_API_KEY="sk-..."`。`.gitignore` 加 `application-local.yml` / `*.env`。
+
+**⭐ Q41（6/29 新增）：数据库怎么从零建库？**
+A：只需在 DBeaver 执行一个文件 [ljx_platform_v2_init.sql](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_backend/sql/ljx_platform_v2_init.sql)（v3.0）。详见 §18 数据库建库指南。
+
 ---
 
-**文档完成日期**：2026-06-29（6/24 + 6/25 + 6/26 + 6/29 四轮增量已合并）
+## 18. 数据库建库指南（⭐ 答辩必备）
+
+### 18.1 前置条件
+
+| 项目 | 要求 |
+|---|---|
+| MySQL 版本 | 8.0+（已用 8.0.46 测试） |
+| 端口 | 3307（可在 application.yml 改） |
+| 字符集 | utf8mb4 / utf8mb4_unicode_ci |
+| 存储引擎 | InnoDB |
+| DBeaver | 任意版本（不需要 8.0.29+ 特性） |
+
+### 18.2 建库步骤（3 步）
+
+#### 第 1 步：创建空数据库
+
+在 DBeaver 中执行：
+
+```sql
+CREATE DATABASE IF NOT EXISTS `ljx_platform`
+  DEFAULT CHARACTER SET utf8mb4
+  DEFAULT COLLATE utf8mb4_unicode_ci;
+```
+
+#### 第 2 步：执行全量脚本
+
+1. DBeaver 左侧导航 → 双击 `ljx_platform` 数据库（确认当前连接指向此库）
+2. **SQL 编辑器** → **打开 SQL 脚本** → 选择 [ljx_platform_v2_init.sql](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_backend/sql/ljx_platform_v2_init.sql)
+3. `Ctrl+A` 全选 → `Ctrl+Enter` 执行
+
+#### 第 3 步：验证
+
+执行以下 SQL，确认 17 张表 + 种子数据就位：
+
+```sql
+-- 验证表数量 (应返回 17)
+SELECT COUNT(*) AS table_count
+  FROM information_schema.tables
+ WHERE table_schema = 'ljx_platform';
+
+-- 验证种子数据
+SELECT 'category'   AS tbl, COUNT(*) AS cnt FROM category
+UNION ALL SELECT 'banner',     COUNT(*) FROM banner
+UNION ALL SELECT 'sys_config', COUNT(*) FROM sys_config
+UNION ALL SELECT 'user',       COUNT(*) FROM user
+UNION ALL SELECT 'article',    COUNT(*) FROM article
+UNION ALL SELECT 'user_work',  COUNT(*) FROM user_work
+UNION ALL SELECT 'product',    COUNT(*) FROM product;
+```
+
+**预期输出**：
+
+| tbl | cnt |
+|---|---|
+| category | 5 |
+| banner | 4 |
+| sys_config | 5 |
+| user | 1 |
+| article | 12 |
+| user_work | 12 |
+| product | 15 |
+
+### 18.3 脚本说明
+
+[ljx_platform_v2_init.sql](file:///c:/Users/Afuz.AFUZZZZZZZZ/Downloads/fstRepo-main%20(1)/fstRepo-main/ljx_backend/sql/ljx_platform_v2_init.sql) v3.0 包含 5 个部分：
+
+| 部分 | 行数 | 内容 |
+|---|---|---|
+| 第一部分 | 49-50 | 准备工作（SET NAMES + 关闭外键检查） |
+| 第二部分 | 57-73 | 清理旧表（17 张表 DROP IF EXISTS，按依赖倒序） |
+| 第三部分 | 80-432 | 建表（17 张表 CREATE，按依赖正序） |
+| 第四部分 | 439-738 | 种子数据（category + banner + sys_config + user + article + user_work + product） |
+| 第五部分 | 745 | 启用外键检查 |
+
+### 18.4 17 张表清单
+
+| # | 表名 | 用途 | 多态字段 |
+|---|---|---|---|
+| 1 | user | 用户 | — |
+| 2 | sys_config | 系统配置 | — |
+| 3 | category | 内容分类 | — |
+| 4 | banner | 轮播图 | — |
+| 5 | article | 文章 | category_id |
+| 6 | post | 帖子 | — |
+| 7 | like_record | 点赞 | target_type + target_id |
+| 8 | comment | 评论 | target_type + target_id |
+| 9 | collect_record | 收藏 | target_type + target_id |
+| 10 | follow | 关注 | — |
+| 11 | footprint | 足迹 | target_type + target_id |
+| 12 | course | 课程 | — |
+| 13 | course_download | 下载记录 | — |
+| 14 | user_work | 用户作品 | — |
+| 15 | product | 商城商品 | category_id (1家具 2木料 3工具 4课程) |
+| 16 | product_order | 订单 | — |
+| 17 | feedback | 反馈 | — |
+
+### 18.5 admin1 测试账号
+
+| 字段 | 值 |
+|---|---|
+| 手机号 | 13800000001 |
+| 邮箱 | admin1@sunmao.com |
+| 密码 | admin123 |
+| 昵称 | admin1 |
+| user_type | 2（管理员） |
+
+### 18.6 两套 category ID 体系（重要！）
+
+| category_id | article 表（首页） | product 表（商城） |
+|---|---|---|
+| 1 | 结构 | 家具 |
+| 2 | 家具 | 木料 |
+| 3 | 木料 | 工具 |
+| 4 | 工具 | 课程 |
+| 5 | 教程 | — |
+
+> ⚠️ **注意**：article 和 product 用不同的 category 体系。前端 index.js（首页）用 article 体系，shop.js（商城）用 product 体系。**不要混用**。
+
+### 18.7 常见问题
+
+**Q：执行报 Duplicate column name 怎么办？**
+A：不会。v3.0 开头先 `DROP TABLE IF EXISTS` 全部 17 张表，再重新 CREATE。无论数据库当前什么状态，跑完就是干净的。
+
+**Q：执行报 Foreign key constraint 怎么办？**
+A：不会。脚本开头 `SET FOREIGN_KEY_CHECKS = 0`，末尾才 `SET FOREIGN_KEY_CHECKS = 1`。
+
+**Q：可以重复执行吗？**
+A：可以。开头 DROP + 末尾启外键，幂等。
+
+**Q：迁移脚本（migrations/ 下）还需要跑吗？**
+A：**不需要**。v3.0 已内置全部迁移。migrations/ 下的两个文件（6/26 + 6/29）可以删除。
+
+---
+
+**文档完成日期**：2026-06-29（6/24 + 6/25 + 6/26 + 6/29 全部增量已合并）
 **整理人**：钟景胜（借助 TRAE AI 助手）
-**总字数**：约 42000 字（6/24 增量约 7000 字 + 6/25 增量约 5000 字 + 6/26 多轮 bug 修复约 11000 字 + 6/29 三轮修复约 9000 字）
+**总字数**：约 50000 字（6/24 增量约 7000 字 + 6/25 增量约 5000 字 + 6/26 多轮 bug 修复约 11000 字 + 6/29 八轮修复约 17000 字 + 数据库建库指南约 1000 字）

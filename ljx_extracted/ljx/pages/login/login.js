@@ -1,113 +1,131 @@
 // pages/login/login.js
+// 登录页 6/29 新建
+// 手机号或邮箱 + 密码, 实时校验
+
 const app = getApp();
+
+const PHONE_RE = /^1[3-9]\d{9}$/;
+const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const PASSWORD_RE = /^.{6,20}$/;
 
 Page({
   data: {
     account: '',
     password: '',
-    loading: false
+    accountError: '',
+    passwordError: '',
+    accountValid: false,
+    passwordValid: false,
+    canSubmit: false,
+    submitting: false,
+    // 记录账号类型: phone / email
+    accountType: ''
   },
 
-  inputAccount(e) {
-    this.setData({ account: e.detail.value });
+  onAccountInput(e) {
+    const val = e.detail.value;
+    let type = '';
+    let error = '';
+    let valid = false;
+
+    if (!val) {
+      error = '';
+      valid = false;
+    } else if (val.indexOf('@') !== -1) {
+      // 邮箱模式
+      type = 'email';
+      if (!EMAIL_RE.test(val)) {
+        error = '请输入正确的邮箱地址';
+        valid = false;
+      } else {
+        error = '';
+        valid = true;
+      }
+    } else {
+      // 手机号模式
+      type = 'phone';
+      if (!PHONE_RE.test(val)) {
+        error = '请输入正确的手机号';
+        valid = false;
+      } else {
+        error = '';
+        valid = true;
+      }
+    }
+
+    this.setData({
+      account: val,
+      accountType: type,
+      accountError: error,
+      accountValid: valid
+    });
+    this._updateSubmit();
   },
 
-  inputPassword(e) {
-    this.setData({ password: e.detail.value });
+  onPasswordInput(e) {
+    const val = e.detail.value;
+    let error = '';
+    let valid = false;
+    if (!val) {
+      error = '';
+      valid = false;
+    } else if (!PASSWORD_RE.test(val)) {
+      error = '密码需要 6-20 位';
+      valid = false;
+    } else {
+      error = '';
+      valid = true;
+    }
+    this.setData({ password: val, passwordError: error, passwordValid: valid });
+    this._updateSubmit();
   },
 
-  doLogin() {
-    const { account, password } = this.data;
+  _updateSubmit() {
+    const can = this.data.accountValid && this.data.passwordValid;
+    this.setData({ canSubmit: can });
+  },
 
-    // 参数校验
-    if (!account || account.trim().length === 0) {
-      wx.showToast({ title: '请输入账号', icon: 'none' });
-      return;
-    }
-    if (!password || password.length === 0) {
-      wx.showToast({ title: '请输入密码', icon: 'none' });
-      return;
-    }
-
-    // ========== 临时测试模式（后端不通时使用） ==========
-    if (account === 'test' && password === '123456') {
-      console.log('使用测试模式登录');
-      wx.setStorageSync('token', 'jwt_token_1');
-      wx.setStorageSync('userId', 1);
-      wx.setStorageSync('nickname', '测试用户');
-      wx.setStorageSync('phone', '13800138000');
-      wx.setStorageSync('avatar', '');
-      wx.setStorageSync('userType', 2);
-      app.globalData.userInfo = { userId: 1, nickname: '测试用户' };
-      wx.showToast({ title: '登录成功（测试模式）', icon: 'success' });
-      setTimeout(() => {
-        wx.switchTab({ url: '/pages/my/my' });
-      }, 1500);
-      return;
-    }
-    // ==================================================
-
-    this.setData({ loading: true });
-    const baseUrl = app.globalData.baseUrl;
-
-    console.log('正在请求后端接口:', baseUrl + '/api/user/login');
-
+  onSubmit() {
+    if (!this.data.canSubmit || this.data.submitting) return;
+    this.setData({ submitting: true });
     wx.request({
-      url: baseUrl + '/api/user/login',
+      url: app.globalData.baseUrl + '/api/user/login',
       method: 'POST',
-      header: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      header: { 'content-type': 'application/x-www-form-urlencoded' },
       data: {
-        account: account,
-        password: password
+        account: this.data.account,
+        password: this.data.password
       },
-      timeout: 10000,
-      success: res => {
-        console.log('后端响应:', res);
+      success: (res) => {
         if (res.data.code === 200) {
-          // 登录成功，保存用户信息
-          const userData = res.data.data;
-          const userId = userData.userId;
-          const nickname = userData.nickname || account;
-          const avatar = userData.avatar || '';
-          const studyHours = userData.studyHours || 0;
-
-          // 生成token格式用于本地存储
-          const token = 'jwt_token_' + userId;
-
-          // 保存到本地存储
-          wx.setStorageSync('token', token);
-          wx.setStorageSync('userId', userId);
-          wx.setStorageSync('nickname', nickname);
-          wx.setStorageSync('avatar', avatar);
-          wx.setStorageSync('userType', userData.userType || 0);
-          app.globalData.userInfo = { userId: userId, nickname: nickname, avatar: avatar, studyHours: studyHours };
-
+          const data = res.data.data;
+          // 保存登录信息到本地
+          wx.setStorageSync('userId', data.userId);
+          wx.setStorageSync('nickname', data.nickname);
+          wx.setStorageSync('avatar', data.avatar || '');
+          wx.setStorageSync('userType', data.userType);
+          wx.setStorageSync('phone', data.phone || '');
+          wx.setStorageSync('email', data.email || '');
+          // 后端未返回 token, 生成模拟 token 与 app.js checkTokenValidity 兼容
+          wx.setStorageSync('token', 'jwt_token_' + data.userId);
           wx.showToast({ title: '登录成功', icon: 'success' });
           setTimeout(() => {
-            wx.switchTab({ url: '/pages/my/my' });
+            wx.switchTab({ url: '/pages/index/index' });
           }, 1500);
         } else {
-          wx.showToast({ title: res.data.msg || res.data.message || '登录失败', icon: 'none' });
+          wx.showToast({ title: res.data.message || '登录失败', icon: 'none' });
         }
       },
-      fail: err => {
-        console.error('网络请求失败详情:', err);
-        wx.showModal({
-          title: '连接失败',
-          content: '无法连接到后端服务器\n\n已启用测试模式\n请使用账号：test\n密码：123456',
-          showCancel: false,
-          confirmText: '知道了'
-        });
+      fail: () => {
+        wx.showToast({ title: '网络错误', icon: 'none' });
       },
       complete: () => {
-        this.setData({ loading: false });
+        this.setData({ submitting: false });
       }
     });
   },
 
   goToRegister() {
-    wx.navigateTo({
-      url: '/pages/register/register'
-    });
+    wx.redirectTo({ url: '/pages/register/register' });
   }
 });

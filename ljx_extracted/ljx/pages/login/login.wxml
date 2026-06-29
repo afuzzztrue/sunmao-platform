@@ -1,34 +1,66 @@
 <!--pages/login/login.wxml-->
-<view class="login-container">
-  <view class="ornament">
-    <view class="ornament-line"></view>
-    <view class="ornament-diamond"></view>
-    <view class="ornament-line"></view>
+<!--登录页 6/29 新建: 手机号或邮箱 + 密码, 实时校验-->
+
+<view class="page">
+
+  <!-- 顶部装饰 -->
+  <view class="header">
+    <view class="logo-circle">
+      <text class="logo-text">榫</text>
+    </view>
+    <text class="title">欢迎回来</text>
+    <text class="subtitle">登录榫卯文化传承社区</text>
   </view>
 
-  <view class="title">欢迎登录</view>
-  <view class="subtitle">登录后体验更多功能</view>
-
+  <!-- 表单 -->
   <view class="form">
-    <view class="input-wrapper">
-      <input class="input" placeholder="请输入账号" bindinput="inputAccount" value="{{account}}" />
+
+    <!-- 账号 (手机号或邮箱) -->
+    <view class="field {{accountError ? 'error' : (accountValid ? 'valid' : '')}}">
+      <text class="field-label">账号</text>
+      <input
+        class="field-input"
+        placeholder="手机号或邮箱"
+        placeholder-class="placeholder"
+        value="{{account}}"
+        bindinput="onAccountInput"
+      />
+      <text class="field-icon" wx:if="{{accountValid}}">✓</text>
     </view>
-    <view class="input-wrapper">
-      <input class="input" placeholder="请输入密码" password bindinput="inputPassword" value="{{password}}" />
+    <text class="field-tip error-tip" wx:if="{{accountError}}">{{accountError}}</text>
+    <text class="field-tip hint-tip" wx:if="{{!accountError && !accountValid && account}}">
+      请输入正确的手机号或邮箱
+    </text>
+
+    <!-- 密码 -->
+    <view class="field {{passwordError ? 'error' : (passwordValid ? 'valid' : '')}}">
+      <text class="field-label">密码</text>
+      <input
+        class="field-input"
+        password="{{true}}"
+        placeholder="请输入密码 (6-20 位)"
+        placeholder-class="placeholder"
+        value="{{password}}"
+        bindinput="onPasswordInput"
+      />
+      <text class="field-icon" wx:if="{{passwordValid}}">✓</text>
     </view>
-  </view>
+    <text class="field-tip error-tip" wx:if="{{passwordError}}">{{passwordError}}</text>
 
-  <button class="btn-login {{loading ? 'disabled' : ''}}" bindtap="doLogin" disabled="{{loading}}">
-    {{loading ? '登录中...' : '登录'}}
-  </button>
+    <!-- 提交按钮 -->
+    <button
+      class="submit-btn {{canSubmit ? 'active' : ''}}"
+      disabled="{{!canSubmit || submitting}}"
+      bindtap="onSubmit"
+    >
+      {{submitting ? '登录中...' : '登录'}}
+    </button>
 
-  <view class="footer">
-    <text class="text">没有账号？</text>
-    <text class="link" bindtap="goToRegister">立即注册</text>
-  </view>
+    <!-- 去注册 -->
+    <view class="bottom-link">
+      <text>还没有账号？</text>
+      <text class="link" bindtap="goToRegister">去注册</text>
+    </view>
 
-  <view class="test-tip">
-    <text class="tip-title">测试账号</text>
-    <text class="tip-content">账号：test  密码：123456</text>
   </view>
 </view>
