@@ -33,13 +33,18 @@ Page({
         if (res.data.code === 200) {
           var data = (res.data.data || []).map(function(o) {
             var t = o.targetType;
+            // 6/29: 拼接 coverImage 完整 URL
+            var cover = o.coverImage || '';
+            if (cover && cover.indexOf('/uploads/') === 0) {
+              cover = app.globalData.baseUrl + cover;
+            }
             return {
               id: o.footprintId,
               targetType: t,
               typeName: that._typeLabel(t),
               targetId: o.targetId,
               title: o.title || (that._typeLabel(t) + ' #' + o.targetId),
-              coverImage: o.coverImage || '',
+              coverImage: cover,
               time: that._formatTime(o.createTime)
             };
           });

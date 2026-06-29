@@ -9,7 +9,7 @@
         6/26 新增: 5 表 LEFT JOIN, 字段名加双引号保留大小写
     -->
     <select id="selectMyFootprintsEnriched" resultType="java.util.HashMap">
-        SELECT fp.id          AS "footprintId",
+        SELECT fp.footprint_id AS "footprintId",
                fp.target_type AS "targetType",
                fp.target_id   AS "targetId",
                fp.create_time AS "createTime",

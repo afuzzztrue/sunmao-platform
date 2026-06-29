@@ -22,9 +22,19 @@ Page({
       return;
     }
     this.setData({ articleId: id });
-    this.loadArticle();
-    this.loadUserStatus();  // 6/26 新增: 加载当前用户对该文章的点赞/收藏状态
-    this.recordFootprint(id);  // 6/26 新增: 记录浏览足迹
+    this.loadArticle();  // loadArticle 内部成功后会调 recordFootprint
+    this.loadUserStatus();
+  },
+
+  /**
+   * 6/29 新增: 把 /uploads/... 相对路径拼成完整 URL
+   * 小程序 <image src> 不会自动拼 baseUrl, 必须手动拼
+   */
+  _fixUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/uploads/')) return baseUrl + url;
+    return url;
   },
 
   /**
@@ -36,20 +46,22 @@ Page({
       url: baseUrl + '/api/article/detail/' + this.data.articleId,
       success: (res) => {
         if (res.data.code === 200 && res.data.data) {
-          // 解析 tags 字符串为数组 (逗号分隔)
           const article = res.data.data;
+          // 6/29: 拼接图片完整 URL (小程序不自动拼 baseUrl)
+          article.coverImage = this._fixUrl(article.coverImage);
           if (article.tags) {
             article.tagsList = article.tags.split(/[,，]/).map(s => s.trim()).filter(s => s);
           } else {
             article.tagsList = [];
           }
-          // 解析 images 字符串为数组
           if (article.images) {
-            article.imagesList = article.images.split(',').map(s => s.trim()).filter(s => s);
+            article.imagesList = article.images.split(',').map(s => s.trim()).filter(s => s).map(s => this._fixUrl(s));
           } else {
             article.imagesList = [];
           }
           this.setData({ article, loading: false });
+          // 6/29: article 加载完后再记录足迹 (之前在 onLoad 调用时 article 为 null)
+          this.recordFootprint(this.data.articleId);
         } else {
           wx.showToast({ title: '文章不存在', icon: 'none' });
           setTimeout(() => wx.navigateBack(), 1500);

@@ -72,13 +72,22 @@ Page({
   },
 
   loadArticleList() {
+    console.log('[index] loadArticleList called');
     wx.request({
       url: baseUrl + '/api/article/hot',
       data: { limit: 10 },
       success: res => {
+        console.log('[index] /api/article/hot response:', res.data.code, (res.data.data || []).length, 'articles');
         if (res.data.code === 200) {
+          // 6/29: 拼接 coverImage 完整 URL
+          const list = (res.data.data || []).map(a => {
+            if (a.coverImage && a.coverImage.startsWith('/uploads/')) {
+              a.coverImage = baseUrl + a.coverImage;
+            }
+            return a;
+          });
           this.setData({
-            articleList: res.data.data,
+            articleList: list,
             loading: false
           }, () => {
             this.splitArticleList();
@@ -86,10 +95,20 @@ Page({
         }
       },
       fail: err => {
-        console.error('获取文章列表失败', err);
+        console.error('[index] 获取文章列表失败', err);
         this.setData({ loading: false });
       }
     });
+  },
+
+  /**
+   * 6/29: 拼接图片完整 URL
+   */
+  _fixUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/uploads/')) return baseUrl + url;
+    return url;
   },
 
   // ========== 双列瀑布流拆分 ==========
@@ -111,18 +130,25 @@ Page({
 
   onSwitchTab(e) {
     const key = e.currentTarget.dataset.key;
+    console.log('[index] onSwitchTab:', key, 'current:', this.data.currentTab);
     if (key === this.data.currentTab) return;
     this.setData({ currentTab: key });
 
     const tab = this.data.topTabs.find(t => t.key === key);
-    if (!tab) return;
+    if (!tab) {
+      console.warn('[index] tab not found for key:', key);
+      return;
+    }
+    console.log('[index] tab found:', JSON.stringify(tab));
 
     // 推荐 / 关注 → 调热门文章接口
     if (!tab.cid) {
+      console.log('[index] -> loadArticleList (recommend/follow)');
       this.loadArticleList();
       return;
     }
     // 分类 tab → 调分类接口
+    console.log('[index] -> loadArticlesByCategory cid=' + tab.cid);
     this.loadArticlesByCategory(tab.cid);
   },
 
@@ -136,8 +162,20 @@ Page({
       url: baseUrl + '/api/article/category/' + cid,
       method: 'GET',
       success: (res) => {
+        console.log('[index] /api/article/category/' + cid + ' response:', res.data.code, (res.data.data || []).length, 'articles');
         if (res.data.code === 200) {
-          const list = (res.data.data || []).map(this._normalizeArticle);
+          // 6/29: 拼接 coverImage 完整 URL
+          const list = (res.data.data || []).map(a => {
+            if (a.coverImage && a.coverImage.startsWith('/uploads/')) {
+              a.coverImage = baseUrl + a.coverImage;
+            }
+            if (a.tags) {
+              a.tagsList = a.tags.split(/[,，]/).map(s => s.trim()).filter(s => s);
+            } else {
+              a.tagsList = [];
+            }
+            return a;
+          });
           this.setData({
             articleList: list,
             loading: false
@@ -219,7 +257,7 @@ Page({
 
   // ========== 生命周期 (保留) ==========
 
-  onShow() {},
+  // 6/29: 删掉了这里重复的空 onShow, 它会覆盖上面第 51 行的 onShow (tab bar 同步)
 
   onHide() {},
 

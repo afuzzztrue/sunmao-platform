@@ -19,15 +19,13 @@ import java.nio.file.Paths;
 
 /**
  * 上传文件服务控制器
- * 6/26 新增: 替代 WebMvcConfig.addResourceHandler, 解决 /uploads/** 500 错误
+ * 6/29 重写: 替代 WebMvcConfig.addResourceHandler, 解决 /uploads/** 500 错误
  *
- * 原因:
- *   - Windows 长路径 + 中文用户名 + addResourceHandler 的 file: 前缀解析在某些场景下抛异常
- *   - 用 Controller + FileSystemResource 走 ResponseEntity, 路径可控, 错误可控
+ * 原因: WebMvcConfig.addResourceHandler 在 Windows 长路径下不稳定
+ * 改用 Controller + FileSystemResource 直接读盘
  *
- * 接口:
- *   GET /uploads/{date}/{filename:.+}
- *   例如: /uploads/2026-06-24/abc.jpg
+ * 接口: GET /uploads/{date}/{filename}
+ * 例如: GET /uploads/2026-06-24/abc.jpg
  */
 @RestController
 public class UploadFileController {
@@ -37,36 +35,29 @@ public class UploadFileController {
     @Value("${ljx.upload.dir:${user.dir}/uploads}")
     private String uploadDir;
 
-    /**
-     * 6/26 新增: 静态服务 /uploads/{date}/{filename}
-     */
     @GetMapping("/uploads/{date}/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String date,
                                                @PathVariable String filename) {
         try {
-            // 1. 路径拼接 + 规范化 (防 ../ 越权)
             Path basePath = Paths.get(uploadDir).toAbsolutePath().normalize();
             Path filePath = basePath.resolve(date).resolve(filename).normalize();
 
-            // 2. 安全校验: 解析后的路径必须在 basePath 下
             if (!filePath.startsWith(basePath)) {
-                log.warn("非法路径访问: {}", filePath);
+                log.warn("path traversal blocked: {}", filePath);
                 return ResponseEntity.status(403).build();
             }
 
             File file = filePath.toFile();
             if (!file.exists() || !file.isFile()) {
-                log.warn("文件不存在: {}", filePath);
+                log.warn("file not found: {}", filePath);
                 return ResponseEntity.notFound().build();
             }
 
-            // 3. 探测 MIME
             String contentType = Files.probeContentType(filePath);
             MediaType mediaType = (contentType != null)
                 ? MediaType.parseMediaType(contentType)
                 : MediaType.APPLICATION_OCTET_STREAM;
 
-            // 4. 构造 Resource, 返回
             Resource resource = new FileSystemResource(file);
             return ResponseEntity.ok()
                     .contentType(mediaType)
@@ -74,7 +65,7 @@ public class UploadFileController {
                     .header(HttpHeaders.CACHE_CONTROL, "max-age=86400")
                     .body(resource);
         } catch (Exception e) {
-            log.error("服务上传文件失败: /uploads/{}/{}", date, filename, e);
+            log.error("serve file error: /uploads/{}/{}", date, filename, e);
             return ResponseEntity.status(500).build();
         }
     }
