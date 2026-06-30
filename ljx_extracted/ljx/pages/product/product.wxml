@@ -23,5 +23,6 @@
     <text class="desc">{{product.description || '暂无描述'}}</text>
   </view>
 
-  <button class="btn-buy" bindtap="doBuy">立即购买</button>
+  <button wx:if="{{product.categoryId === 4}}" class="btn-buy btn-download" bindtap="doDownloadCourse">下载课程</button>
+  <button wx:else class="btn-buy" bindtap="doBuy">立即购买</button>
 </view>

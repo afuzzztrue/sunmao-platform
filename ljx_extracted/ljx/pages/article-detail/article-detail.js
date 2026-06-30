@@ -11,7 +11,10 @@ Page({
     article: null,
     loading: true,
     liked: false,
-    collected: false
+    collected: false,
+    isLogin: false,
+    currentUserId: 0,
+    isFollowing: false
   },
 
   onLoad(options) {
@@ -21,7 +24,8 @@ Page({
       setTimeout(() => wx.navigateBack(), 1500);
       return;
     }
-    this.setData({ articleId: id });
+    const userId = wx.getStorageSync('userId') || 0;
+    this.setData({ articleId: id, currentUserId: userId, isLogin: !!userId });
     this.loadArticle({ recordFootprint: true, incrementView: true });
     this.loadUserStatus();
   },
@@ -66,6 +70,8 @@ Page({
           // 7/1: 只有初次进入详情页才记录足迹和浏览量
           if (recordFootprint) this.recordFootprint(this.data.articleId);
           if (incrementView) this.incrementView(this.data.articleId);
+          // 7/1: 加载当前用户对作者的关注状态
+          this.loadFollowStatus();
         } else {
           wx.showToast({ title: '文章不存在', icon: 'none' });
           setTimeout(() => wx.navigateBack(), 1500);
@@ -132,6 +138,56 @@ Page({
             collected: !!res.data.data.collected
           });
         }
+      }
+    });
+  },
+
+  /**
+   * 7/1 新增: 加载当前用户是否已关注文章作者
+   */
+  loadFollowStatus() {
+    const userId = wx.getStorageSync('userId');
+    const authorId = this.data.article && this.data.article.userId;
+    if (!userId || !authorId || userId == authorId) return;
+    wx.request({
+      url: baseUrl + '/api/follow/status?userId=' + userId + '&followUserId=' + authorId,
+      success: (res) => {
+        if (res.data.code === 200 && res.data.data) {
+          this.setData({ isFollowing: !!res.data.data.following });
+        }
+      }
+    });
+  },
+
+  /**
+   * 7/1 新增: 关注 / 取消关注文章作者
+   */
+  onToggleFollow() {
+    const userId = wx.getStorageSync('userId');
+    const authorId = this.data.article && this.data.article.userId;
+    if (!userId) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+    if (!authorId || userId == authorId) {
+      wx.showToast({ title: '不能关注自己', icon: 'none' });
+      return;
+    }
+    wx.request({
+      url: baseUrl + '/api/follow/toggle',
+      method: 'POST',
+      header: { 'content-type': 'application/x-www-form-urlencoded' },
+      data: { userId: userId, followUserId: authorId },
+      success: (res) => {
+        if (res.data.code === 200) {
+          this.setData({ isFollowing: !this.data.isFollowing });
+          wx.showToast({ title: this.data.isFollowing ? '已关注' : '已取消关注', icon: 'none' });
+        } else {
+          wx.showToast({ title: res.data.message || '操作失败', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '网络错误', icon: 'none' });
       }
     });
   },

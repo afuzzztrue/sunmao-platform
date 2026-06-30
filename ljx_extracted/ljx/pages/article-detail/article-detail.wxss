@@ -84,6 +84,21 @@
   color: var(--color-text-muted);
 }
 
+/* 7/1 新增: 关注按钮 */
+.follow-btn {
+  margin-left: 16rpx;
+  padding: 4rpx 16rpx;
+  font-size: 22rpx;
+  color: #FFFFFF;
+  background: #3E2723;
+  border-radius: 20rpx;
+}
+
+.follow-btn.following {
+  color: #3E2723;
+  background: #E5E0D8;
+}
+
 /* ========== 摘要 ========== */
 .summary {
   margin: 0 32rpx 32rpx;

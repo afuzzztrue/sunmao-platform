@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,6 +31,24 @@ public class FollowController {
         Map<String, Integer> result = new HashMap<>();
         result.put("followCount", followService.getFollowCount(userId));
         result.put("followerCount", followService.getFollowerCount(userId));
+        return Result.success(result);
+    }
+
+    @GetMapping("/list/{userId}")
+    public Result<List<Map<String, Object>>> getFollowList(@PathVariable Integer userId) {
+        return Result.success(followService.getFollowList(userId));
+    }
+
+    @GetMapping("/fans/{userId}")
+    public Result<List<Map<String, Object>>> getFollowerList(@PathVariable Integer userId) {
+        return Result.success(followService.getFollowerList(userId));
+    }
+
+    @GetMapping("/status")
+    public Result<Map<String, Boolean>> isFollowing(@RequestParam Integer userId,
+                                                    @RequestParam Integer followUserId) {
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("following", followService.isFollowing(userId, followUserId));
         return Result.success(result);
     }
 }

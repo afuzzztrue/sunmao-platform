@@ -23,6 +23,7 @@
       <text class="article-title">{{article.title}}</text>
       <view class="article-meta">
         <text class="meta-author">@{{article.userId || '榫卯'}}</text>
+        <text wx:if="{{isLogin && article.userId && article.userId !== currentUserId}}" class="follow-btn {{isFollowing ? 'following' : ''}}" bindtap="onToggleFollow">{{isFollowing ? '已关注' : '+ 关注'}}</text>
         <text class="meta-divider">·</text>
         <text class="meta-time">{{article.createTime}}</text>
       </view>

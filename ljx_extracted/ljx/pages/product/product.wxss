@@ -26,3 +26,6 @@ page{background:var(--color-bg,#F5F0E8)}
 
 .btn-buy{position:fixed;bottom:0;left:0;right:0;height:112rpx;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3E2723,#4E342E);color:#FFFFFF;font-size:34rpx;font-weight:600;letter-spacing:4rpx;border-radius:0;border:none;padding:0;padding-bottom:env(safe-area-inset-bottom);z-index:100}
 .btn-buy::after{border:none}
+
+/* 7/1 新增: 下载课程按钮样式 */
+.btn-download{background:linear-gradient(135deg,#2E7D32,#43A047)}

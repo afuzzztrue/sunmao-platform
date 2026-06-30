@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 /**
  * 关注关系数据访问层
  */
@@ -20,4 +22,10 @@ public interface FollowMapper extends BaseMapper<Follow> {
 
     @Select("SELECT COUNT(*) FROM follow WHERE follow_user_id = #{userId}")
     Integer selectFollowerCount(@Param("userId") Integer userId);
+
+    @Select("SELECT follow_user_id FROM follow WHERE user_id = #{userId} ORDER BY create_time DESC")
+    List<Integer> selectFollowUserIds(@Param("userId") Integer userId);
+
+    @Select("SELECT user_id FROM follow WHERE follow_user_id = #{userId} ORDER BY create_time DESC")
+    List<Integer> selectFollowerUserIds(@Param("userId") Integer userId);
 }

@@ -1,0 +1,21 @@
+<!--pages/follow-list/follow-list.wxml-->
+<view class="page">
+  <view class="header">
+    <text class="title">{{type === 'fans' ? '粉丝' : '关注'}}</text>
+  </view>
+
+  <view class="user-list" wx:if="{{list.length > 0}}">
+    <view class="user-item" wx:for="{{list}}" wx:key="userId" bindtap="goToUserProfile" data-userid="{{item.userId}}">
+      <image class="avatar" src="{{item.avatar || '../images/kk.png'}}" mode="aspectFill" />
+      <view class="user-info">
+        <text class="nickname">{{item.nickname || '用户' + item.userId}}</text>
+      </view>
+      <image class="arrow" src="../images/向右箭头.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{!loading && list.length === 0}}">
+    <text class="empty-icon">👀</text>
+    <text class="empty-text">{{type === 'fans' ? '还没有粉丝' : '还没有关注任何人'}}</text>
+  </view>
+</view>

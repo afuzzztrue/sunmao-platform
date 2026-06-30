@@ -19,6 +19,8 @@ public class Product {
 
     private Integer categoryId;
 
+    private Integer courseId;
+
     private BigDecimal price;
 
     private String coverImage;

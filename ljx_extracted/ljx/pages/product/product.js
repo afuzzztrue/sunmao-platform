@@ -53,5 +53,37 @@ Page({
         wx.showToast({ title: '网络异常，请稍后再试', icon: 'none' });
       }
     });
+  },
+
+  /**
+   * 7/1 新增: 下载课程 (categoryId=4 的商品)
+   */
+  doDownloadCourse() {
+    var userId = wx.getStorageSync('userId');
+    if (!userId) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+    var courseId = this.data.product.courseId;
+    if (!courseId) {
+      wx.showToast({ title: '课程信息缺失', icon: 'none' });
+      return;
+    }
+    wx.request({
+      url: baseUrl + '/api/course/download',
+      method: 'POST',
+      header: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      data: { courseId: courseId, userId: userId },
+      success: function(res) {
+        if (res.data.code === 200) {
+          wx.showToast({ title: '已加入我的课程', icon: 'success' });
+        } else {
+          wx.showToast({ title: res.data.message || '下载失败', icon: 'none' });
+        }
+      },
+      fail: function() {
+        wx.showToast({ title: '网络异常，请稍后再试', icon: 'none' });
+      }
+    });
   }
 });

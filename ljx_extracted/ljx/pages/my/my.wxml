@@ -20,12 +20,12 @@
   </view>
 
   <view class="stats-card">
-    <view class="stat-item">
+    <view class="stat-item" bindtap="goToFollowList" data-type="follow">
       <text class="stat-label">{{followCount}}</text>
       <text class="stat-num">关注</text>
     </view>
     <view class="stat-divider"></view>
-    <view class="stat-item">
+    <view class="stat-item" bindtap="goToFollowList" data-type="fans">
       <text class="stat-label">{{followerCount}}</text>
       <text class="stat-num">粉丝</text>
     </view>

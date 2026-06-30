@@ -23,7 +23,9 @@
     "pages/help/help",
     "pages/support/support",
     "pages/settings/settings",
-    "pages/global-search/global-search"
+    "pages/global-search/global-search",
+    "pages/follow-list/follow-list",
+    "pages/user-profile/user-profile"
   ],
   "window": {
     "backgroundTextStyle": "light",

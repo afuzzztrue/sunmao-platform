@@ -107,6 +107,20 @@ Page({
   goToSettings: function() { wx.navigateTo({ url: '/pages/settings/settings' }); },
   goToGlobalSearch: function() { wx.navigateTo({ url: '/pages/global-search/global-search' }); },
 
+  /**
+   * 7/1 新增: 跳转关注/粉丝列表
+   */
+  goToFollowList(e) {
+    if (!this.data.isLogin) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+    const type = e.currentTarget.dataset.type || 'follow';
+    wx.navigateTo({
+      url: '/pages/follow-list/follow-list?type=' + type + '&userId=' + this.data.userInfo.userId
+    });
+  },
+
   logout() {
     wx.showModal({
       title: '提示',
