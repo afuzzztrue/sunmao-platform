@@ -1,0 +1,28 @@
+@startuml seq-06-like
+' 序列图6：点赞文章
+title 点赞文章序列图
+
+actor 用户 as User
+participant "article-detail.js" as Front
+participant "ArticleController" as Ctrl
+participant "LikeService" as Svc
+participant "LikeMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 点击点赞按钮
+Front -> Ctrl: POST /api/article/{id}/like
+Ctrl -> Svc: toggleLike(userId,target_type=1,target_id)
+Svc -> Mapper: select(userId,target_type,target_id)
+Mapper -> DB: SELECT * FROM like_record WHERE...
+DB --> Mapper: 记录(无)
+Mapper --> Svc: null
+Svc -> Mapper: insert(userId,target_type,target_id)
+Mapper -> DB: INSERT INTO like_record
+Svc -> Mapper: updateArticleLikeCount(id,+1)
+Mapper -> DB: UPDATE article SET like_count=like_count+1
+Svc --> Ctrl: 已点赞
+Ctrl --> Front: {code:200, liked:true}
+Front -> Front: 更新点赞数+1,按钮变色
+Front --> User: 显示已点赞状态
+
+@enduml

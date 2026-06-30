@@ -1,0 +1,24 @@
+@startuml seq-12-shop-list
+' 序列图12：商城浏览商品
+title 商城浏览商品序列图
+
+actor 用户 as User
+participant "shop.js" as Front
+participant "ProductController" as Ctrl
+participant "ProductService" as Svc
+participant "ProductMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 打开商城,点击分类tab(全部/家具/木料/工具/课程)
+Front -> Ctrl: GET /api/product/list?categoryId=0
+Ctrl -> Svc: list(categoryId)
+Svc -> Mapper: selectByCategory(categoryId)
+Mapper -> DB: SELECT * FROM product WHERE category_id=? OR 0=?
+DB --> Mapper: List<Product>
+Mapper --> Svc: List<Product>
+Svc --> Ctrl: List<Product>
+Ctrl --> Front: {code:200, data:List}
+Front -> Front: _fixUrl()拼接图片baseUrl
+Front --> User: 渲染商品瀑布流
+
+@enduml

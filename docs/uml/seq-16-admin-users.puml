@@ -1,0 +1,26 @@
+@startuml seq-16-admin-users
+' 序列图16：管理员管理用户
+title 管理员管理用户序列图
+
+actor 管理员 as Admin
+participant "admin.js" as Front
+participant "my.js" as MyFront
+participant "AdminController" as Ctrl
+participant "UserService" as Svc
+participant "UserMapper" as Mapper
+database "MySQL" as DB
+
+Admin -> MyFront: 打开"我的"页
+MyFront -> MyFront: 校验userType===2显示管理入口
+Admin -> Front: 点击"用户管理"
+Front -> Ctrl: GET /api/admin/user/list
+Ctrl -> Svc: listAllUsers()
+Svc -> Mapper: selectAll()
+Mapper -> DB: SELECT * FROM user
+DB --> Mapper: List<User>
+Mapper --> Svc: List<User>
+Svc --> Ctrl: List<User>
+Ctrl --> Front: {code:200, data:List}
+Front --> Admin: 渲染用户列表表格
+
+@enduml

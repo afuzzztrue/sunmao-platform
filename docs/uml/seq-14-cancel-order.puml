@@ -1,0 +1,24 @@
+@startuml seq-14-cancel-order
+' 序列图14：取消订单
+title 取消订单序列图
+
+actor 用户 as User
+participant "order.js" as Front
+participant "ProductController" as Ctrl
+participant "ProductService" as Svc
+participant "ProductOrderMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 点击订单"取消"按钮
+Front -> Ctrl: POST /api/product/order/cancel(orderId)
+Ctrl -> Svc: cancelOrder(orderId)
+Svc -> Mapper: updateStatus(orderId, status=4 已取消)
+Mapper -> DB: UPDATE product_order SET status=4 WHERE order_id=?
+DB --> Mapper: 影响行数1
+Mapper --> Svc: 成功
+Svc --> Ctrl: 成功
+Ctrl --> Front: {code:200}
+Front -> Front: 从待支付列表移除
+Front --> User: 提示订单已取消
+
+@enduml

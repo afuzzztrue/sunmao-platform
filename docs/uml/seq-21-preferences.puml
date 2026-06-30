@@ -1,0 +1,25 @@
+@startuml seq-21-preferences
+' 序列图21：修改用户偏好
+title 修改用户偏好序列图
+
+actor 用户 as User
+participant "settings.js" as Front
+participant "UserController" as Ctrl
+participant "UserService" as Svc
+participant "UserMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 在设置页调整偏好(难度/分类等)
+User -> Front: 点击"保存"
+Front -> Ctrl: PUT /api/user/preferences/{userId}
+Ctrl -> Svc: updatePreferences(userId,preferences)
+Svc -> Mapper: update(userId,preferences)
+Mapper -> DB: UPDATE user SET preferences=? WHERE user_id=?
+DB --> Mapper: 影响行数1
+Mapper --> Svc: 成功
+Svc --> Ctrl: 成功
+Ctrl --> Front: {code:200}
+Front -> Front: 更新本地缓存
+Front --> User: 提示保存成功
+
+@enduml

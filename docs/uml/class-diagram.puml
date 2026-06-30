@@ -1,0 +1,161 @@
+@startuml class-diagram
+' 榫卯非遗文化传承平台 - 类图
+' 生成方式：IDEA 装PlantUML插件 → 打开此文件 → 右键 Preview → 导出PNG
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' ========== Entity 层 ==========
+package "Entity 层 (16个)" {
+    class User {
+        +user_id: Long
+        +openid: String
+        +nickname: String
+        +avatar: String
+        +phone: String
+        +email: String
+        +password: String
+        +gender: Integer
+        +user_type: Integer
+        +preferences: String
+        +create_time: Date
+    }
+    class Article {
+        +article_id: Long
+        +category_id: Long
+        +user_id: Long
+        +title: String
+        +content: String
+        +cover_image: String
+        +like_count: Integer
+        +collect_count: Integer
+        +create_time: Date
+    }
+    class UserWork {
+        +work_id: Long
+        +user_id: Long
+        +title: String
+        +images: String
+        +category_id: Long
+        +like_count: Integer
+        +create_time: Date
+    }
+    class Product {
+        +product_id: Long
+        +category_id: Long
+        +name: String
+        +price: BigDecimal
+        +image: String
+        +stock: Integer
+        +status: Integer
+    }
+    class ProductOrder {
+        +order_id: Long
+        +user_id: Long
+        +product_id: Long
+        +quantity: Integer
+        +total_price: BigDecimal
+        +status: Integer
+        +create_time: Date
+    }
+    class LikeRecord {
+        +like_id: Long
+        +user_id: Long
+        +target_type: Integer
+        +target_id: Long
+        +create_time: Date
+    }
+    class CollectRecord {
+        +collect_id: Long
+        +user_id: Long
+        +target_type: Integer
+        +target_id: Long
+        +create_time: Date
+    }
+    class Footprint {
+        +footprint_id: Long
+        +user_id: Long
+        +target_type: Integer
+        +target_id: Long
+        +snapshot_title: String
+        +snapshot_cover: String
+        +create_time: Date
+    }
+    class Comment {
+        +comment_id: Long
+        +user_id: Long
+        +target_type: Integer
+        +target_id: Long
+        +content: String
+        +create_time: Date
+    }
+    class Follow {
+        +follow_id: Long
+        +follower_id: Long
+        +followee_id: Long
+        +create_time: Date
+    }
+    class Course {
+        +course_id: Long
+        +title: String
+        +price: BigDecimal
+        +duration: Integer
+    }
+    class CourseDownload {
+        +download_id: Long
+        +user_id: Long
+        +course_id: Long
+        +progress: Integer
+        +create_time: Date
+    }
+    class Category {
+        +category_id: Long
+        +name: String
+        +description: String
+        +icon: String
+    }
+    class Banner {
+        +banner_id: Long
+        +image: String
+        +link: String
+        +sort_order: Integer
+    }
+    class Feedback {
+        +feedback_id: Long
+        +user_id: Long
+        +type: String
+        +content: String
+        +create_time: Date
+    }
+    class SysConfig {
+        +config_id: Long
+        +config_key: String
+        +config_value: String
+    }
+}
+
+' ========== 关系 ==========
+User "1" -- "N" Article : 发布
+User "1" -- "N" UserWork : 发布
+User "1" -- "N" ProductOrder : 下单
+User "1" -- "N" LikeRecord : 点赞
+User "1" -- "N" CollectRecord : 收藏
+User "1" -- "N" Footprint : 浏览
+User "1" -- "N" Comment : 评论
+User "1" -- "N" Follow : 关注(follower_id)
+User "1" -- "N" CourseDownload : 下载
+
+Category "1" -- "N" Article : 分类
+Product "1" -- "N" ProductOrder : 订单
+Course "1" -- "N" CourseDownload : 下载
+
+' 多态关联（target_type + target_id）
+LikeRecord ..> Article : target_type=1
+LikeRecord ..> UserWork : target_type=3
+LikeRecord ..> Course : target_type=4
+CollectRecord ..> Article : target_type=1
+CollectRecord ..> UserWork : target_type=3
+Footprint ..> Article : target_type=1
+Comment ..> Article : target_type=1
+
+@enduml

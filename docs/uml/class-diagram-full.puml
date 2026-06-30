@@ -1,0 +1,515 @@
+@startuml class-diagram-full
+' 榫卯非遗文化传承平台 - 完整后端类图
+' 包含：18 Controller + 15 Service 接口 + 17 Mapper + 16 Entity + Common
+' 注意：因类数量较多，本图采用按层分组布局，方法已精简核心接口
+' 生成方式：IDEA PlantUML 插件 → Preview → 导出 PNG（建议横向长图）
+
+title 榫卯非遗文化传承平台 - 后端完整类图
+
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+' ========== Common ==========
+package "common" {
+    class Result<T> {
+        +code: Integer
+        +message: String
+        +data: T
+        +success(T): Result<T>
+        +error(String): Result<T>
+    }
+    class PageResult<T> {
+        +total: Long
+        +records: List<T>
+    }
+}
+
+' ========== Entity ==========
+package "entity" {
+    class User {
+        -userId: Integer
+        -openid: String
+        -unionid: String
+        -nickname: String
+        -avatar: String
+        -phone: String
+        -email: String
+        -password: String
+        -gender: Integer
+        -province: String
+        -city: String
+        -studyHours: Integer
+        -userType: Integer
+        -status: Integer
+        -preferences: String
+        -createTime: LocalDateTime
+        -updateTime: LocalDateTime
+    }
+    class Article {
+        -articleId: Integer
+        -categoryId: Integer
+        -userId: Integer
+        -title: String
+        -content: String
+        -coverImage: String
+        -images: String
+        -viewCount: Integer
+        -likeCount: Integer
+        -collectCount: Integer
+        -commentCount: Integer
+        -isHot: Integer
+        -isBanner: Integer
+        -sortOrder: Integer
+        -status: Integer
+        -createTime: LocalDateTime
+        -updateTime: LocalDateTime
+    }
+    class Post {
+        -postId: Integer
+        -userId: Integer
+        -title: String
+        -content: String
+        -likeCount: Integer
+        -commentCount: Integer
+        -shareCount: Integer
+        -postType: Integer
+        -status: Integer
+        -createTime: LocalDateTime
+        -updateTime: LocalDateTime
+    }
+    class UserWork {
+        -workId: Integer
+        -userId: Integer
+        -title: String
+        -description: String
+        -images: String
+        -categoryId: Integer
+        -viewCount: Integer
+        -likeCount: Integer
+        -commentCount: Integer
+        -collectCount: Integer
+        -status: Integer
+        -createTime: LocalDateTime
+        -updateTime: LocalDateTime
+    }
+    class Course {
+        -courseId: Integer
+        -categoryId: Integer
+        -userId: Integer
+        -title: String
+        -description: String
+        -coverImage: String
+        -videoUrl: String
+        -price: BigDecimal
+        -duration: Integer
+        -difficulty: Integer
+        -viewCount: Integer
+        -likeCount: Integer
+        -downloadCount: Integer
+        -sortOrder: Integer
+        -status: Integer
+        -createTime: LocalDateTime
+        -updateTime: LocalDateTime
+    }
+    class Product {
+        -productId: Integer
+        -productName: String
+        -categoryId: Integer
+        -price: BigDecimal
+        -coverImage: String
+        -description: String
+        -stock: Integer
+        -status: Integer
+        -createTime: LocalDateTime
+    }
+    class ProductOrder {
+        -orderId: Integer
+        -productId: Integer
+        -productName: String
+        -userId: Integer
+        -quantity: Integer
+        -totalPrice: BigDecimal
+        -status: Integer
+        -createTime: LocalDateTime
+        -updateTime: LocalDateTime
+    }
+    class CourseDownload {
+        -downloadId: Integer
+        -userId: Integer
+        -courseId: Integer
+        -progress: Integer
+        -createTime: LocalDateTime
+    }
+    class Category {
+        -categoryId: Integer
+        -name: String
+        -parentId: Integer
+        -sortOrder: Integer
+        -icon: String
+        -description: String
+        -status: Integer
+        -createTime: LocalDateTime
+    }
+    class Banner {
+        -bannerId: Integer
+        -title: String
+        -imageUrl: String
+        -linkUrl: String
+        -linkType: Integer
+        -linkId: Integer
+        -sortOrder: Integer
+        -status: Integer
+        -createTime: LocalDateTime
+    }
+    class Comment {
+        -commentId: Integer
+        -userId: Integer
+        -targetType: Integer
+        -targetId: Integer
+        -parentId: Integer
+        -content: String
+        -likeCount: Integer
+        -status: Integer
+        -createTime: LocalDateTime
+    }
+    class LikeRecord {
+        -likeId: Integer
+        -userId: Integer
+        -targetType: Integer
+        -targetId: Integer
+        -createTime: LocalDateTime
+    }
+    class CollectRecord {
+        -collectId: Integer
+        -userId: Integer
+        -articleId: Integer
+        -targetType: Integer
+        -targetId: Integer
+        -createTime: LocalDateTime
+    }
+    class Footprint {
+        -footprintId: Integer
+        -userId: Integer
+        -articleId: Integer
+        -targetType: Integer
+        -targetId: Integer
+        -snapshotTitle: String
+        -snapshotCover: String
+        -snapshotAuthor: String
+        -createTime: LocalDateTime
+    }
+    class Follow {
+        -followId: Integer
+        -userId: Integer
+        -followUserId: Integer
+        -createTime: LocalDateTime
+    }
+    class Feedback {
+        -feedbackId: Integer
+        -userId: Integer
+        -fbType: Integer
+        -content: String
+        -contact: String
+        -device: String
+        -status: Integer
+        -reply: String
+        -replyTime: LocalDateTime
+        -createTime: LocalDateTime
+    }
+}
+
+' ========== Mapper ==========
+package "mapper" {
+    interface UserMapper {
+        +selectByOpenid(String): User
+        +selectByPhone(String): User
+        +selectByEmail(String): User
+        +selectPreferences(Integer): String
+        +updatePreferences(Integer, String): int
+    }
+    interface ArticleMapper {
+        +selectHotList(Integer): List<Article>
+        +selectByCategoryId(Integer): List<Article>
+        +incrementViewCount(Integer): int
+        +updateLikeCount(Integer, Integer): int
+        +updateCollectCount(Integer, Integer): int
+        +updateCommentCount(Integer, Integer): int
+    }
+    interface PostMapper {
+        +selectPageList(Integer, Integer): List<Post>
+        +selectByUserId(Integer): List<Post>
+        +updateLikeCount(Integer, Integer): int
+        +updateCommentCount(Integer, Integer): int
+    }
+    interface UserWorkMapper {
+        +selectByUserId(Integer): List<UserWork>
+    }
+    interface CourseMapper {
+        +selectByCategoryId(Integer): List<Course>
+        +selectByDifficulty(Integer): List<Course>
+        +incrementViewCount(Integer): int
+        +incrementDownloadCount(Integer): int
+    }
+    interface ProductMapper
+    interface ProductOrderMapper
+    interface CourseDownloadMapper {
+        +selectByUserAndCourse(Integer, Integer): CourseDownload
+        +selectUserDownloadsWithCourse(Integer, Integer): List<Map>
+    }
+    interface CategoryMapper {
+        +selectByParentId(Integer): List<Category>
+    }
+    interface BannerMapper {
+        +selectActiveList(): List<Banner>
+    }
+    interface CommentMapper {
+        +selectRootComments(Integer, Integer): List<Comment>
+        +selectReplies(Integer): List<Comment>
+    }
+    interface LikeRecordMapper {
+        +selectByUserAndTarget(Integer, Integer, Integer): LikeRecord
+        +selectMyLikes(Integer, Integer): List<Map>
+        +selectMyLikesEnriched(Integer, Integer): List<Map>
+    }
+    interface CollectRecordMapper {
+        +selectByUserAndArticle(Integer, Integer): CollectRecord
+        +selectByUserAndTarget(Integer, Integer, Integer): CollectRecord
+        +selectMyCollectsEnriched(Integer, Integer): List<Map>
+    }
+    interface FootprintMapper {
+        +selectMyFootprintsEnriched(Integer, Integer): List<Map>
+    }
+    interface FollowMapper {
+        +selectByUserAndTarget(Integer, Integer): Follow
+        +selectFollowCount(Integer): Integer
+        +selectFollowerCount(Integer): Integer
+    }
+    interface SearchMapper {
+        +globalSearch(String, Integer): List<Map>
+    }
+    interface FeedbackMapper
+}
+
+' ========== Service ==========
+package "service" {
+    interface UserService {
+        +getByOpenid(String): User
+        +getByPhone(String): User
+        +getByEmail(String): User
+        +wxLogin(String, String, String, String): User
+        +register(String, String, String, String): User
+        +login(String, String): User
+        +updateStudyHours(Integer, Integer): void
+        +getPreferences(Integer): String
+        +updatePreferences(Integer, String): void
+    }
+    interface ArticleService {
+        +getHotList(Integer): List<Article>
+        +getListByCategory(Integer): List<Article>
+        +getDetail(Integer): Article
+        +incrementViewCount(Integer): void
+        +toggleLike(Integer, Integer): void
+        +toggleCollect(Integer, Integer): void
+        +toggleLikeAndReturn(Integer, Integer): boolean
+        +toggleCollectAndReturn(Integer, Integer): boolean
+        +create(Article): Integer
+    }
+    interface PostService {
+        +getPostList(Integer, Integer): List<Post>
+        +getUserPosts(Integer): List<Post>
+        +toggleLike(Integer, Integer): void
+    }
+    interface UserWorkService {
+        +getUserWorks(Integer): List<UserWork>
+    }
+    interface CourseService {
+        +getCoursesByCategory(Integer): List<Course>
+        +getCoursesByDifficulty(Integer): List<Course>
+        +recordDownload(Integer, Integer): void
+        +getUserDownloads(Integer, Integer): List<Map>
+    }
+    interface ProductService
+    interface ProductOrderService
+    interface CourseDownloadService
+    interface CategoryService {
+        +getAllCategories(): List<Category>
+        +getCategoriesByParentId(Integer): List<Category>
+    }
+    interface BannerService {
+        +getActiveBanners(): List<Banner>
+    }
+    interface CommentService
+    interface LikeService {
+        +myLikes(Integer, Integer): List<Map>
+    }
+    interface CollectService {
+        +myCollects(Integer, Integer): List<Map>
+    }
+    interface FootprintService {
+        +getUserFootprints(Integer, Integer): List<Footprint>
+        +addFootprint(Integer, Integer, Integer, Integer): void
+    }
+    interface FollowService {
+        +toggleFollow(Integer, Integer): void
+        +getFollowCount(Integer): Integer
+        +getFollowerCount(Integer): Integer
+    }
+    interface SearchService {
+        +globalSearch(String, Integer): List<Map>
+    }
+    interface FeedbackService {
+        +submit(Feedback): void
+        +pageQuery(Integer, Integer, Integer, Integer): IPage<Feedback>
+    }
+    interface ChatService
+}
+
+' ========== Controller ==========
+package "controller" {
+    class UserController {
+        +register(String, String, String, String): Result<User>
+        +login(String, String): Result<Map>
+        +wxLogin(String, String, String, String): Result<Map>
+        +getUserInfo(Integer): Result<Map>
+        +updateUser(User): Result<Void>
+        +getPreferences(Integer): Result<String>
+        +updatePreferences(Integer, String): Result<Void>
+    }
+    class ArticleController {
+        +getHotList(Integer): Result<List<Article>>
+        +getListByCategory(Integer): Result<List<Article>>
+        +getDetail(Integer): Result<Article>
+        +toggleLike(Integer, Integer): Result<Map>
+        +toggleCollect(Integer, Integer): Result<Map>
+        +getUserStatus(Integer, Integer): Result<Map>
+        +create(Article): Result<Map>
+    }
+    class PostController {
+        +getPostList(Integer, Integer): Result<List<Post>>
+        +getUserPosts(Integer): Result<List<Post>>
+        +publishPost(Post): Result<Void>
+        +toggleLike(Integer, Integer): Result<Void>
+    }
+    class UserWorkController {
+        +getUserWorks(Integer): Result<List<UserWork>>
+        +publishWork(UserWork): Result<Void>
+    }
+    class CourseController {
+        +getCoursesByCategory(Integer): Result<List<Course>>
+        +getCoursesByDifficulty(Integer): Result<List<Course>>
+        +recordDownload(Integer, Integer): Result<Void>
+        +getUserDownloads(Integer, Integer): Result<List<Map>>
+    }
+    class ProductController {
+        +list(Integer): Result<List<Product>>
+        +detail(Integer): Result<Product>
+        +search(String): Result<List<Product>>
+        +createOrder(Integer, Integer, Integer): Result<ProductOrder>
+        +myOrders(Integer): Result<List<ProductOrder>>
+        +cancelOrder(Integer, Integer): Result<String>
+        +deleteOrder(Integer, Integer): Result<String>
+    }
+    class CategoryController {
+        +getAllCategories(): Result<List<Category>>
+    }
+    class BannerController {
+        +getActiveBanners(): Result<List<Banner>>
+    }
+    class CommentController
+    class LikeController {
+        +myLikes(Integer, Integer): Result<List<Map>>
+    }
+    class CollectController {
+        +myCollects(Integer, Integer): Result<List<Map>>
+    }
+    class FootprintController {
+        +getUserFootprints(Integer, Integer): Result<List<Footprint>>
+        +myFootprints(Integer, Integer): Result<List<Map>>
+        +addFootprint(Integer, Integer, Integer, Integer): Result<Void>
+    }
+    class FollowController {
+        +toggleFollow(Integer, Integer): Result<Void>
+        +getFollowCount(Integer): Result<Map>
+    }
+    class SearchController {
+        +global(String, Integer): Result<List<Map>>
+    }
+    class FeedbackController {
+        +submit(Feedback, HttpServletRequest): Result<Void>
+        +list(Integer, Integer, Integer, Integer): Result<IPage<Feedback>>
+    }
+    class ChatController {
+        +query(String, String): Result<Map>
+    }
+    class AdminController {
+        +userList(Integer, Integer): Result<Map>
+        +userSearch(String): Result<List<User>>
+        +userAdd(String, String, String): Result<User>
+        +userUpdate(User): Result<Void>
+        +userDelete(Integer): Result<Void>
+    }
+    class UploadController {
+        +upload(MultipartFile[]): Result<List<String>>
+    }
+    class UploadFileController {
+        +serveFile(String, String): ResponseEntity<Resource>
+    }
+}
+
+' ========== 依赖关系 ==========
+UserController ..> UserService
+ArticleController ..> ArticleService
+PostController ..> PostService
+UserWorkController ..> UserWorkService
+CourseController ..> CourseService
+ProductController ..> ProductService
+ProductController ..> ProductOrderService
+CategoryController ..> CategoryService
+BannerController ..> BannerService
+LikeController ..> LikeService
+CollectController ..> CollectService
+FootprintController ..> FootprintService
+FollowController ..> FollowService
+SearchController ..> SearchService
+FeedbackController ..> FeedbackService
+ChatController ..> ChatService
+AdminController ..> UserService
+UploadController ..> Result
+
+UserService ..> UserMapper
+ArticleService ..> ArticleMapper
+PostService ..> PostMapper
+UserWorkService ..> UserWorkMapper
+CourseService ..> CourseMapper
+CourseService ..> CourseDownloadMapper
+CategoryService ..> CategoryMapper
+BannerService ..> BannerMapper
+LikeService ..> LikeRecordMapper
+CollectService ..> CollectRecordMapper
+FootprintService ..> FootprintMapper
+FollowService ..> FollowMapper
+SearchService ..> SearchMapper
+FeedbackService ..> FeedbackMapper
+
+UserMapper --> User
+ArticleMapper --> Article
+PostMapper --> Post
+UserWorkMapper --> UserWork
+CourseMapper --> Course
+CourseDownloadMapper --> CourseDownload
+ProductMapper --> Product
+ProductOrderMapper --> ProductOrder
+CategoryMapper --> Category
+BannerMapper --> Banner
+CommentMapper --> Comment
+LikeRecordMapper --> LikeRecord
+CollectRecordMapper --> CollectRecord
+FootprintMapper --> Footprint
+FollowMapper --> Follow
+SearchMapper --> Article
+SearchMapper --> Post
+SearchMapper --> UserWork
+SearchMapper --> Course
+
+@enduml

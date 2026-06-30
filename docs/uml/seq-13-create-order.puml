@@ -1,0 +1,29 @@
+@startuml seq-13-create-order
+' 序列图13：创建订单
+title 创建订单序列图
+
+actor 用户 as User
+participant "product.js" as Front
+participant "ProductController" as Ctrl
+participant "ProductService" as Svc
+participant "ProductMapper" as PMapper
+participant "ProductOrderMapper" as OMapper
+database "MySQL" as DB
+
+User -> Front: 点击商品详情页"立即购买"
+Front -> Ctrl: POST /api/product/order/create(userId,productId,quantity)
+Ctrl -> Svc: createOrder(userId,productId,quantity)
+Svc -> PMapper: selectById(productId)
+PMapper -> DB: SELECT * FROM product WHERE product_id=?
+DB --> PMapper: Product
+PMapper --> Svc: Product(含price)
+Svc -> Svc: 计算total_price = price*quantity
+Svc -> OMapper: insert(order)
+OMapper -> DB: INSERT INTO product_order(status=0 待支付)
+DB --> OMapper: order_id
+OMapper --> Svc: order_id
+Svc --> Ctrl: order_id
+Ctrl --> Front: {code:200, orderId}
+Front --> User: 跳转订单页(待支付状态)
+
+@enduml

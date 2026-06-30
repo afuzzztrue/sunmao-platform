@@ -1,0 +1,24 @@
+@startuml seq-03-article-hot
+' 序列图3：浏览首页热门文章
+title 浏览首页热门文章列表序列图
+
+actor 用户 as User
+participant "index.js" as Front
+participant "ArticleController" as Ctrl
+participant "ArticleService" as Svc
+participant "ArticleMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 打开首页
+Front -> Ctrl: GET /api/article/hot
+Ctrl -> Svc: hot()
+Svc -> Mapper: selectHot()
+Mapper -> DB: SELECT * FROM article ORDER BY like_count DESC LIMIT 10
+DB --> Mapper: List<Article>
+Mapper --> Svc: List<Article>
+Svc --> Ctrl: List<Article>
+Ctrl --> Front: {code:200, data:List}
+Front -> Front: _fixUrl()拼接baseUrl
+Front --> User: 渲染抖音风双列瀑布流
+
+@enduml

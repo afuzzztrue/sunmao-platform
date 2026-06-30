@@ -1,0 +1,23 @@
+@startuml seq-08-footprint
+' 序列图8：记录浏览足迹
+title 记录浏览足迹序列图
+
+actor 用户 as User
+participant "article-detail.js" as Front
+participant "FootprintController" as Ctrl
+participant "FootprintService" as Svc
+participant "FootprintMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 进入文章详情页(onLoad)
+Front -> Ctrl: POST /api/footprint/add(userId,target_type=1,target_id,snapshot_title,snapshot_cover,snapshot_author)
+Ctrl -> Svc: add(footprint)
+Svc -> Mapper: insert(footprint)
+Mapper -> DB: INSERT INTO footprint(user_id,target_type,target_id,snapshot_*,create_time)
+DB --> Mapper: 影响行数1
+Mapper --> Svc: footprint_id
+Svc --> Ctrl: 成功
+Ctrl --> Front: {code:200}
+Front -> Front: 静默成功(不打扰用户)
+
+@enduml

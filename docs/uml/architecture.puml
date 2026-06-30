@@ -1,0 +1,42 @@
+@startuml architecture
+' 系统总体架构图
+' 生成方式：IDEA 装PlantUML插件 → 打开此文件 → 右键 Preview → 导出PNG
+
+title 榫卯非遗文化传承平台 - 系统总体架构图
+
+skinparam rectangle {
+    BackgroundColor #F5F5F5
+    BorderColor #666666
+}
+
+rectangle "前端 (微信小程序原生)" as Frontend {
+    rectangle "pages/\n(27个页面)" as Pages
+    rectangle "custom-tab-bar\n(5项底部导航)" as TabBar
+    rectangle "app.js\n(全局逻辑+请求封装)" as AppJs
+}
+
+rectangle "后端 (Spring Boot 2.7.18)" as Backend {
+    rectangle "Controller 层\n(18个控制器)" as Ctrl
+    rectangle "Service 层\n(15个服务)" as Svc
+    rectangle "Mapper 层\n(MyBatis-Plus)" as Mapper
+    rectangle "Entity 层\n(16个实体)" as Entity
+}
+
+rectangle "数据层" as Data {
+    database "MySQL 8.0\nljx_platform库\n(17张表)" as DB
+    rectangle "本地 uploads/\n(图片存储)" as Disk
+}
+
+rectangle "第三方服务" as Third {
+    rectangle "DeepSeek API\n(AI文化导师)" as AI
+}
+
+Frontend --> Ctrl : HTTP/JSON (wx.request)
+Ctrl --> Svc
+Svc --> Mapper
+Mapper --> Entity
+Mapper --> DB : JDBC (Druid连接池)
+Ctrl --> Disk : FileSystemResource\n(静态资源访问)
+Svc --> AI : HTTP POST\napi.deepseek.com
+
+@enduml

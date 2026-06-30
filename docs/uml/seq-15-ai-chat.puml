@@ -1,0 +1,24 @@
+@startuml seq-15-ai-chat
+' 序列图15：AI文化导师对话
+title AI 文化导师对话序列图
+
+actor 用户 as User
+participant "chat.js" as Front
+participant "ChatController" as Ctrl
+participant "ChatService" as Svc
+participant "application.yml" as Config
+participant "DeepSeek API" as API
+
+User -> Front: 输入问题"什么是燕尾榫?"
+Front -> Ctrl: POST /api/chat/query(userId,question)
+Ctrl -> Svc: query(userId,question)
+Svc -> Config: 读取deepseek.api-key
+Config --> Svc: apiKey(或环境变量DEEPSEEK_API_KEY)
+Svc -> API: HTTP POST api.deepseek.com/chat/completions
+API -> API: 大模型推理
+API --> Svc: {choices:[{message:{content:"..."}}]}
+Svc --> Ctrl: AI回复文本
+Ctrl --> Front: {code:200, data:reply}
+Front --> User: 渲染AI回复气泡
+
+@enduml

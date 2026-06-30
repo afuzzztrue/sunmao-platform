@@ -1,0 +1,79 @@
+@startuml polymorphism
+' 榫卯非遗文化传承平台 - 多态关联关系图
+' 展示 like_record / collect_record / comment / footprint 四张表
+' 如何通过 target_type + target_id 与 article / post / user_work / course 关联
+' 这是本项目的核心创新设计
+
+title 榫卯非遗文化传承平台 - 多态关联关系图
+
+skinparam linetype ortho
+
+entity "like_record\n(点赞记录)" as Like {
+    like_id
+    user_id
+    target_type
+    target_id
+}
+
+entity "collect_record\n(收藏记录)" as Collect {
+    collect_id
+    user_id
+    target_type
+    target_id
+}
+
+entity "comment\n(评论)" as Comment {
+    comment_id
+    user_id
+    target_type
+    target_id
+    content
+}
+
+entity "footprint\n(足迹)" as Footprint {
+    footprint_id
+    user_id
+    target_type
+    target_id
+    snapshot_title
+}
+
+entity "article\n(文章)" as Article {
+    article_id
+}
+
+entity "post\n(帖子)" as Post {
+    post_id
+}
+
+entity "user_work\n(作品)" as Work {
+    work_id
+}
+
+entity "course\n(课程)" as Course {
+    course_id
+}
+
+Like --> Article : target_type=1
+collect .. Article : target_type=1
+Comment --> Article : target_type=1
+Footprint --> Article : target_type=1
+
+Like --> Post : target_type=2
+Like --> Work : target_type=3
+Collect --> Work : target_type=3
+Comment --> Work : target_type=3
+Footprint --> Work : target_type=3
+
+Like --> Course : target_type=4
+
+legend right
+    target_type 取值：
+    1 = 文章(article)
+    2 = 帖子(post)
+    3 = 作品(user_work)
+    4 = 课程(course)
+    5 = 结构(article中特定分类)
+endlegend
+
+@enduml

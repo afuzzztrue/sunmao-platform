@@ -1,0 +1,25 @@
+@startuml seq-19-my-likes
+' 序列图19：获取我的点赞列表
+title 获取我的点赞列表序列图
+
+actor 用户 as User
+participant "likes.js" as Front
+participant "LikeController" as Ctrl
+participant "LikeService" as Svc
+participant "LikeMapper.xml" as Mapper
+database "MySQL" as DB
+
+User -> Front: 打开"我的点赞"页,切换tab(作品/课程/帖子)
+Front -> Ctrl: GET /api/like/my/{userId}
+Ctrl -> Svc: myLikes(userId)
+Svc -> Mapper: selectMyLikesEnriched(userId)
+Mapper -> DB: SELECT lr.*, a.title, a.cover_image, uw.title, c.title, p.title FROM like_record lr LEFT JOIN article a ON ... LEFT JOIN user_work uw ON ... LEFT JOIN course c ON ... LEFT JOIN post p ON ... WHERE lr.user_id=?
+DB --> Mapper: List<Map>
+Mapper --> Svc: List<LikeVO>
+Svc --> Ctrl: List<LikeVO>
+Ctrl --> Front: {code:200, data:List}
+Front -> Front: _fixUrl()拼接封面图
+Front -> Front: 按target_type分组渲染
+Front --> User: 显示点赞列表
+
+@enduml

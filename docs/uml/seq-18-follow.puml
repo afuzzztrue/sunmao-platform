@@ -1,0 +1,26 @@
+@startuml seq-18-follow
+' 序列图18：关注/取关用户
+title 关注/取关用户序列图
+
+actor 用户 as User
+participant "用户主页" as Front
+participant "FollowController" as Ctrl
+participant "FollowService" as Svc
+participant "FollowMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 点击"关注"按钮
+Front -> Ctrl: POST /api/follow/toggle(followerId,followeeId)
+Ctrl -> Svc: toggle(followerId,followeeId)
+Svc -> Mapper: select(followerId,followeeId)
+Mapper -> DB: SELECT * FROM follow WHERE...
+DB --> Mapper: 记录(无)
+Mapper --> Svc: null
+Svc -> Mapper: insert(followerId,followeeId)
+Mapper -> DB: INSERT INTO follow
+Svc --> Ctrl: 已关注
+Ctrl --> Front: {code:200, followed:true}
+Front -> Front: 按钮变"已关注",粉丝数+1
+Front --> User: 显示已关注状态
+
+@enduml

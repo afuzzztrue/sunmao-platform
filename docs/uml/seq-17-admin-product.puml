@@ -1,0 +1,24 @@
+@startuml seq-17-admin-product
+' 序列图17：管理员上架商品
+title 管理员上架商品序列图
+
+actor 管理员 as Admin
+participant "admin-edit.js" as Front
+participant "AdminController" as Ctrl
+participant "ProductService" as Svc
+participant "ProductMapper" as Mapper
+database "MySQL" as DB
+
+Admin -> Front: 填写商品名/价格/图片/分类/库存
+Admin -> Front: 点击"上架"
+Front -> Ctrl: POST /api/admin/product/add(name,price,image,categoryId,stock)
+Ctrl -> Svc: add(product)
+Svc -> Mapper: insert(product)
+Mapper -> DB: INSERT INTO product
+DB --> Mapper: product_id
+Mapper --> Svc: product_id
+Svc --> Ctrl: product_id
+Ctrl --> Front: {code:200}
+Front --> Admin: 提示上架成功,返回管理列表
+
+@enduml

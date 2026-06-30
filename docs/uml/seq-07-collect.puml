@@ -1,0 +1,28 @@
+@startuml seq-07-collect
+' 序列图7：收藏文章
+title 收藏文章序列图
+
+actor 用户 as User
+participant "article-detail.js" as Front
+participant "CollectController" as Ctrl
+participant "CollectService" as Svc
+participant "CollectMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 点击收藏按钮
+Front -> Ctrl: POST /api/article/{id}/collect
+Ctrl -> Svc: toggleCollect(userId,target_type=1,target_id)
+Svc -> Mapper: select(userId,target_type,target_id)
+Mapper -> DB: SELECT * FROM collect_record WHERE...
+DB --> Mapper: 记录(无)
+Mapper --> Svc: null
+Svc -> Mapper: insert(userId,target_type,target_id)
+Mapper -> DB: INSERT INTO collect_record
+Svc -> Mapper: updateArticleCollectCount(id,+1)
+Mapper -> DB: UPDATE article SET collect_count=collect_count+1
+Svc --> Ctrl: 已收藏
+Ctrl --> Front: {code:200, collected:true}
+Front -> Front: 更新收藏数+1,按钮变色
+Front --> User: 显示已收藏状态
+
+@enduml

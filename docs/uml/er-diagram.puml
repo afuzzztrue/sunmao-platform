@@ -1,0 +1,238 @@
+@startuml er-diagram-v2
+' 榫卯非遗文化传承平台 - 数据库 ER 图（分层布局优化版）
+' 设计思路：
+'   第1层（顶部）：用户表 + 配置/分类/轮播等基础表
+'   第2层（中部）：关联表（点赞/收藏/评论/足迹/关注/反馈/订单/下载）
+'   第3层（底部）：内容表（文章/帖子/作品/课程/商品）
+'   关系线统一从上到下走，减少交叉；多态关系用右侧说明替代过多虚线。
+' 生成方式：IDEA 装PlantUML插件 → 打开此文件 → 右键 Preview → 导出 PNG
+
+title 榫卯非遗文化传承平台 - 数据库 ER 图
+
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #333333
+    ArrowColor #333333
+}
+
+!define table(x) class x << (T,#FFE4E1) >>
+!define pk(x) <b><color:#CC0000>x</color></b>
+!define fk(x) <color:#0066CC>x</color>
+
+' ========== 第一层：核心用户与基础配置 ==========
+together {
+    table(user) {
+        pk(user_id): BIGINT
+        openid: VARCHAR
+        nickname: VARCHAR
+        avatar: VARCHAR
+        phone: VARCHAR
+        email: VARCHAR
+        password: VARCHAR
+        gender: INT
+        user_type: INT
+        preferences: JSON
+        create_time: DATETIME
+    }
+}
+
+together {
+    table(sys_config) {
+        pk(config_id): INT
+        config_key: VARCHAR
+        config_value: VARCHAR
+        description: VARCHAR
+    }
+    table(category) {
+        pk(category_id): INT
+        name: VARCHAR
+        description: VARCHAR
+        icon: VARCHAR
+    }
+    table(banner) {
+        pk(banner_id): INT
+        image: VARCHAR
+        link: VARCHAR
+        sort_order: INT
+    }
+}
+
+' ========== 第二层：用户行为关联表 ==========
+together {
+    table(like_record) {
+        pk(like_id): BIGINT
+        fk(user_id): BIGINT
+        target_type: TINYINT
+        target_id: BIGINT
+        create_time: DATETIME
+    }
+    table(collect_record) {
+        pk(collect_id): BIGINT
+        fk(user_id): BIGINT
+        target_type: TINYINT
+        target_id: BIGINT
+        create_time: DATETIME
+    }
+    table(comment) {
+        pk(comment_id): BIGINT
+        fk(user_id): BIGINT
+        target_type: TINYINT
+        target_id: BIGINT
+        content: TEXT
+        create_time: DATETIME
+    }
+    table(footprint) {
+        pk(footprint_id): BIGINT
+        fk(user_id): BIGINT
+        target_type: TINYINT
+        target_id: BIGINT
+        snapshot_title: VARCHAR
+        snapshot_cover: VARCHAR
+        snapshot_author: VARCHAR
+        create_time: DATETIME
+    }
+}
+
+together {
+    table(follow) {
+        pk(follow_id): BIGINT
+        fk(follower_id): BIGINT
+        fk(followee_id): BIGINT
+        create_time: DATETIME
+    }
+    table(feedback) {
+        pk(feedback_id): BIGINT
+        fk(user_id): BIGINT
+        type: VARCHAR
+        content: TEXT
+        contact: VARCHAR
+        create_time: DATETIME
+    }
+}
+
+' ========== 第三层：内容/业务实体表 ==========
+together {
+    table(article) {
+        pk(article_id): BIGINT
+        fk(category_id): INT
+        fk(user_id): BIGINT
+        title: VARCHAR
+        content: TEXT
+        cover_image: VARCHAR
+        images: JSON
+        view_count: INT
+        like_count: INT
+        collect_count: INT
+        create_time: DATETIME
+    }
+    table(post) {
+        pk(post_id): BIGINT
+        fk(user_id): BIGINT
+        title: VARCHAR
+        content: TEXT
+        create_time: DATETIME
+    }
+    table(user_work) {
+        pk(work_id): BIGINT
+        fk(user_id): BIGINT
+        title: VARCHAR
+        content: TEXT
+        images: JSON
+        category_id: INT
+        view_count: INT
+        like_count: INT
+        create_time: DATETIME
+    }
+}
+
+together {
+    table(course) {
+        pk(course_id): INT
+        title: VARCHAR
+        description: TEXT
+        cover_image: VARCHAR
+        price: DECIMAL
+        duration: INT
+    }
+    table(course_download) {
+        pk(download_id): BIGINT
+        fk(user_id): BIGINT
+        fk(course_id): INT
+        progress: INT
+        create_time: DATETIME
+    }
+}
+
+together {
+    table(product) {
+        pk(product_id): INT
+        category_id: INT
+        name: VARCHAR
+        price: DECIMAL
+        image: VARCHAR
+        description: TEXT
+        stock: INT
+        status: INT
+    }
+    table(product_order) {
+        pk(order_id): BIGINT
+        fk(user_id): BIGINT
+        fk(product_id): INT
+        quantity: INT
+        total_price: DECIMAL
+        status: INT
+        create_time: DATETIME
+    }
+}
+
+' ========== 关系连线（分层自上而下） ==========
+' 用户 → 关联表（中部）
+user -down- "N" like_record : 1 : 点赞
+user -down- "N" collect_record : 1 : 收藏
+user -down- "N" comment : 1 : 评论
+user -down- "N" footprint : 1 : 浏览
+user -down- "N" follow : 1 : 关注者/被关注者
+user -down- "N" feedback : 1 : 反馈
+
+' 用户 → 内容/业务表（直接发布/下单/下载）
+user -down- "N" article : 1 : 发布文章
+user -down- "N" post : 1 : 发布帖子
+user -down- "N" user_work : 1 : 发布作品
+user -down- "N" course_download : 1 : 下载课程
+user -down- "N" product_order : 1 : 下单
+
+' 分类 → 文章
+category -down- "N" article : 1 : 分类
+
+' 内容/业务表 → 关联表（多态逻辑关联，用右侧注释统一说明）
+like_record .[#6666CC].> article : target_type=1
+like_record .[#6666CC].> post : target_type=2
+like_record .[#6666CC].> user_work : target_type=3
+like_record .[#6666CC].> course : target_type=4
+
+collect_record .[#6666CC].> article : target_type=1
+collect_record .[#6666CC].> user_work : target_type=3
+
+comment .[#6666CC].> article : target_type=1
+comment .[#6666CC].> user_work : target_type=3
+
+footprint .[#6666CC].> article : target_type=1
+footprint .[#6666CC].> user_work : target_type=3
+
+' 课程/商品 → 关联业务表
+course -down- "N" course_download : 1 : 课程下载
+product -down- "N" product_order : 1 : 订单商品
+
+' ========== 图例说明 ==========
+legend right
+    |= 图例 |= 含义 |
+    | <color:#CC0000>红色加粗</color> | 主键(PK) |
+    | <color:#0066CC>蓝色</color> | 外键(FK) |
+    | 实线 | 数据库表之间的1:N关系 |
+    | 蓝色虚线 | 多态逻辑关联(target_type+target_id) |
+    | target_type取值 | 1=文章, 2=帖子, 3=作品, 4=课程, 5=结构 |
+endlegend
+
+@enduml

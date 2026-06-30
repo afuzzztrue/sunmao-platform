@@ -1,0 +1,28 @@
+@startuml seq-01-register
+' 序列图1：用户注册
+title 用户注册序列图
+
+actor 用户 as User
+participant "register.js" as Front
+participant "UserController" as Ctrl
+participant "UserService" as Svc
+participant "UserMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 填写手机号/邮箱/昵称/密码
+Front -> Front: 5栏实时校验(正则)
+User -> Front: 点击注册
+Front -> Ctrl: POST /api/user/register(phone,email,password,nickname)
+Ctrl -> Svc: register(phone,email,password,nickname)
+Svc -> Svc: MD5加密密码
+Svc -> Mapper: insertUser(User)
+Mapper -> DB: INSERT INTO user
+DB --> Mapper: 影响行数1
+Mapper --> Svc: user_id
+Svc --> Ctrl: User对象
+Ctrl --> Front: {code:200, data:User}
+Front -> Front: wx.setStorageSync(userId)
+Front -> Front: wx.setStorageSync(token)
+Front --> User: 跳转我的页
+
+@enduml

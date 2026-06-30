@@ -1,0 +1,26 @@
+@startuml seq-02-login
+' 序列图2：用户登录
+title 用户登录序列图
+
+actor 用户 as User
+participant "login.js" as Front
+participant "UserController" as Ctrl
+participant "UserService" as Svc
+participant "UserMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 输入账号(手机号/邮箱)+密码
+Front -> Ctrl: POST /api/user/login(account,password)
+Ctrl -> Svc: login(account,password)
+Svc -> Mapper: selectByAccount(account)
+Mapper -> DB: SELECT * FROM user WHERE phone=? OR email=?
+DB --> Mapper: User对象
+Mapper --> Svc: User
+Svc -> Svc: 校验MD5密码
+Svc --> Ctrl: User对象
+Ctrl --> Front: {code:200, data:User}
+Front -> Front: wx.setStorageSync(userId)
+Front -> Front: wx.setStorageSync(token)
+Front --> User: 跳转我的页
+
+@enduml

@@ -1,0 +1,24 @@
+@startuml seq-20-feedback
+' 序列图20：提交反馈
+title 提交反馈序列图
+
+actor 用户 as User
+participant "help.js" as Front
+participant "FeedbackController" as Ctrl
+participant "FeedbackService" as Svc
+participant "FeedbackMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 填写反馈类型/内容/联系方式
+User -> Front: 点击"提交"
+Front -> Ctrl: POST /api/feedback/submit(userId,type,content,contact)
+Ctrl -> Svc: submit(feedback)
+Svc -> Mapper: insert(feedback)
+Mapper -> DB: INSERT INTO feedback(user_id,type,content,contact,create_time)
+DB --> Mapper: feedback_id
+Mapper --> Svc: feedback_id
+Svc --> Ctrl: feedback_id
+Ctrl --> Front: {code:200}
+Front --> User: 提示提交成功,感谢反馈
+
+@enduml

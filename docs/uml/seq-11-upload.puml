@@ -1,0 +1,26 @@
+@startuml seq-11-upload
+' 序列图11：上传图片
+title 上传图片序列图
+
+actor 用户 as User
+participant "前端" as Front
+participant "UploadController" as Ctrl
+participant "ImageUtil" as ImgUtil
+participant "UploadUtil" as UpUtil
+participant "本地磁盘" as Disk
+
+User -> Front: wx.chooseImage选择图片
+Front -> Ctrl: wx.uploadFile POST /api/upload
+Ctrl -> ImgUtil: isImage(filename)校验扩展名
+ImgUtil --> Ctrl: true
+Ctrl -> UpUtil: saveFile(file)
+UpUtil -> UpUtil: 生成UUID文件名
+UpUtil -> UpUtil: 按日期分目录(yyyy-MM-dd)
+UpUtil -> Disk: 写入uploads/yyyy-MM-dd/xxx.jpg
+Disk --> UpUtil: 成功
+UpUtil --> Ctrl: /uploads/yyyy-MM-dd/xxx.jpg
+Ctrl --> Front: {url: /uploads/.../xxx.jpg}
+Front -> Front: _fixUrl()拼接baseUrl
+Front --> User: 预览图片
+
+@enduml

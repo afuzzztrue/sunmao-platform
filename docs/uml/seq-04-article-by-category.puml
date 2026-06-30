@@ -1,0 +1,24 @@
+@startuml seq-04-article-by-category
+' 序列图4：按分类查文章
+title 按分类查文章序列图
+
+actor 用户 as User
+participant "index.js" as Front
+participant "ArticleController" as Ctrl
+participant "ArticleService" as Svc
+participant "ArticleMapper" as Mapper
+database "MySQL" as DB
+
+User -> Front: 点击分类tab(结构/家具/木料/工具/教程)
+Front -> Ctrl: GET /api/article/category/{cid}
+Ctrl -> Svc: byCategory(cid)
+Svc -> Mapper: selectByCategory(cid)
+Mapper -> DB: SELECT * FROM article WHERE category_id=?
+DB --> Mapper: List<Article>
+Mapper --> Svc: List<Article>
+Svc --> Ctrl: List<Article>
+Ctrl --> Front: {code:200, data:List}
+Front -> Front: _fixUrl()拼接baseUrl
+Front --> User: 切换显示该分类文章
+
+@enduml

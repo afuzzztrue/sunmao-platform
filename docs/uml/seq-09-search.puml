@@ -1,0 +1,25 @@
+@startuml seq-09-search
+' 序列图9：全局搜索(5表UNION ALL)
+title 全局搜索序列图（5表 UNION ALL）
+
+actor 用户 as User
+participant "global-search.js" as Front
+participant "SearchController" as Ctrl
+participant "SearchService" as Svc
+participant "SearchMapper.xml" as Mapper
+database "MySQL" as DB
+
+User -> Front: 输入关键词"榫卯"
+Front -> Ctrl: GET /api/search/global?keyword=榫卯&limit=20
+Ctrl -> Svc: search(keyword,limit)
+Svc -> Mapper: search(keyword,limit)
+Mapper -> DB: SELECT 'article' AS type,... FROM article WHERE title LIKE '%榫卯%' UNION ALL SELECT 'user_work'... UNION ALL SELECT 'course'... UNION ALL SELECT 'post'... UNION ALL SELECT 'article'...(结构类) LIMIT 20
+DB --> Mapper: 聚合结果集
+Mapper --> Svc: List<Map>
+Svc -> Svc: 按type分组
+Svc --> Ctrl: List<SearchResultVO>
+Ctrl --> Front: {code:200, data:List}
+Front -> Front: 分组渲染(文章/作品/课程/帖子)
+Front --> User: 显示搜索结果
+
+@enduml
