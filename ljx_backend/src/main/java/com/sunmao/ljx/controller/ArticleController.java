@@ -35,6 +35,25 @@ public class ArticleController {
         return Result.success(articleService.getDetail(articleId));
     }
 
+    /**
+     * 7/1 新增: 显式增加文章浏览量
+     * 由文章详情页 onLoad 调用，确保只有真正查看详情时才 +1
+     */
+    @PostMapping("/view/{articleId}")
+    public Result<Void> incrementViewCount(@PathVariable Integer articleId) {
+        articleService.incrementViewCount(articleId);
+        return Result.success();
+    }
+
+    /**
+     * 7/1 新增: 查询某用户发布的文章列表
+     * 用于"我的"页面"我的作品"二级 tab
+     */
+    @GetMapping("/user/{userId}")
+    public Result<List<Article>> getUserArticles(@PathVariable Integer userId) {
+        return Result.success(articleService.getUserArticles(userId));
+    }
+
     @PostMapping("/like")
     public Result<Map<String, Object>> toggleLike(@RequestParam Integer articleId,
                                                    @RequestParam Integer userId) {

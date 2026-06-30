@@ -45,11 +45,20 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public Article getDetail(Integer articleId) {
-        Article article = getById(articleId);
-        if (article != null) {
-            incrementViewCount(articleId);
-        }
-        return article;
+        // 7/1 修复: getDetail 不再自动增加浏览量
+        // 浏览量增长改为前端详情页 onLoad 时显式调用 /api/article/view/{articleId}
+        // 避免点赞/收藏刷新时重复增加 viewCount
+        return getById(articleId);
+    }
+
+    @Override
+    public List<Article> getUserArticles(Integer userId) {
+        return baseMapper.selectList(
+            new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Article>()
+                .eq("user_id", userId)
+                .eq("status", 1)
+                .orderByDesc("create_time")
+        );
     }
 
     /**

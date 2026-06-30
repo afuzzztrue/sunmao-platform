@@ -22,7 +22,7 @@ Page({
       return;
     }
     this.setData({ articleId: id });
-    this.loadArticle();  // loadArticle 内部成功后会调 recordFootprint
+    this.loadArticle({ recordFootprint: true, incrementView: true });
     this.loadUserStatus();
   },
 
@@ -40,8 +40,11 @@ Page({
   /**
    * 加载文章详情
    * GET /api/article/detail/{id}
+   * 7/1 修复: 增加 options 参数控制是否记录足迹/增加浏览量
+   * 避免点赞/收藏刷新时重复增加 viewCount 和足迹
    */
-  loadArticle() {
+  loadArticle(options = {}) {
+    const { recordFootprint = false, incrementView = false } = options;
     wx.request({
       url: baseUrl + '/api/article/detail/' + this.data.articleId,
       success: (res) => {
@@ -60,8 +63,9 @@ Page({
             article.imagesList = [];
           }
           this.setData({ article, loading: false });
-          // 6/29: article 加载完后再记录足迹 (之前在 onLoad 调用时 article 为 null)
-          this.recordFootprint(this.data.articleId);
+          // 7/1: 只有初次进入详情页才记录足迹和浏览量
+          if (recordFootprint) this.recordFootprint(this.data.articleId);
+          if (incrementView) this.incrementView(this.data.articleId);
         } else {
           wx.showToast({ title: '文章不存在', icon: 'none' });
           setTimeout(() => wx.navigateBack(), 1500);
@@ -72,6 +76,18 @@ Page({
         wx.showToast({ title: '网络错误', icon: 'none' });
         this.setData({ loading: false });
       }
+    });
+  },
+
+  /**
+   * 7/1 新增: 显式增加浏览量
+   * 只有真正查看详情时才调用，避免点赞/收藏刷新导致 viewCount 异常
+   */
+  incrementView(articleId) {
+    wx.request({
+      url: baseUrl + '/api/article/view/' + articleId,
+      method: 'POST',
+      fail: () => { /* 静默忽略 */ }
     });
   },
 
@@ -138,10 +154,14 @@ Page({
       success: (res) => {
         if (res.data.code === 200 && res.data.data) {
           // 用后端返回值同步本地
-          this.setData({ liked: !!res.data.data.liked });
-          wx.showToast({ title: res.data.data.liked ? '已赞' : '已取消', icon: 'none' });
-          // 刷新文章数据以更新 likeCount
-          this.loadArticle();
+          const liked = !!res.data.data.liked;
+          const likeCount = res.data.data.likeCount;
+          this.setData({
+            liked: liked,
+            'article.likeCount': likeCount !== undefined ? likeCount : this.data.article.likeCount
+          });
+          wx.showToast({ title: liked ? '已赞' : '已取消', icon: 'none' });
+          // 7/1 修复: 不再调用 loadArticle，避免重复记录足迹和浏览量
         }
       }
     });
@@ -150,6 +170,7 @@ Page({
   /**
    * 收藏 / 取消收藏
    * 6/26 升级: 使用后端返回的 collected 同步本地
+   * 7/1 修复: 不再调用 loadArticle，避免重复记录足迹和浏览量
    */
   onTapCollect() {
     const userId = wx.getStorageSync('userId');
@@ -164,9 +185,13 @@ Page({
       data: { articleId: this.data.articleId, userId: userId },
       success: (res) => {
         if (res.data.code === 200 && res.data.data) {
-          this.setData({ collected: !!res.data.data.collected });
-          wx.showToast({ title: res.data.data.collected ? '已收藏' : '已取消', icon: 'none' });
-          this.loadArticle();
+          const collected = !!res.data.data.collected;
+          const collectCount = res.data.data.collectCount;
+          this.setData({
+            collected: collected,
+            'article.collectCount': collectCount !== undefined ? collectCount : this.data.article.collectCount
+          });
+          wx.showToast({ title: collected ? '已收藏' : '已取消', icon: 'none' });
         }
       }
     });

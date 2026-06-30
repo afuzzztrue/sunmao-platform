@@ -14,7 +14,16 @@ public interface ArticleService extends IService<Article> {
 
     List<Article> getListByCategory(Integer categoryId);
 
+    /**
+     * 7/1 修复: 拆分为只读详情 + 显式浏览量增长
+     * 调用方: 文章详情页 onLoad
+     */
     Article getDetail(Integer articleId);
+
+    /**
+     * 7/1 新增: 查询某用户发布的文章列表(用于"我的作品")
+     */
+    List<Article> getUserArticles(Integer userId);
 
     void incrementViewCount(Integer articleId);
 
