@@ -94,6 +94,14 @@
   margin-left: 12rpx;
 }
 
+/* 7/1 新增: 密码可见性切换图标 */
+.eye-icon {
+  width: 44rpx;
+  height: 44rpx;
+  margin-left: 16rpx;
+  flex-shrink: 0;
+}
+
 .field-tip {
   display: block;
   font-size: 24rpx;

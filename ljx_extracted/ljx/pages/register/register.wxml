@@ -64,11 +64,18 @@
       <text class="field-label">密码</text>
       <input
         class="field-input"
-        password="{{true}}"
+        password="{{!passwordVisible}}"
         placeholder="请输入密码 (6-20 位)"
         placeholder-class="placeholder"
         value="{{password}}"
         bindinput="onPasswordInput"
+      />
+      <!-- 7/1 新增: 密码可见性切换图标 -->
+      <image
+        class="eye-icon"
+        src="{{passwordVisible ? '../images/眼睛开.png' : '../images/眼睛-闭.png'}}"
+        mode="aspectFit"
+        bindtap="onTogglePasswordVisible"
       />
       <text class="field-icon" wx:if="{{passwordValid}}">✓</text>
     </view>
@@ -79,11 +86,18 @@
       <text class="field-label">确认密码</text>
       <input
         class="field-input"
-        password="{{true}}"
+        password="{{!confirmPasswordVisible}}"
         placeholder="请再次输入密码"
         placeholder-class="placeholder"
         value="{{confirmPassword}}"
         bindinput="onConfirmPasswordInput"
+      />
+      <!-- 7/1 新增: 确认密码可见性切换图标 -->
+      <image
+        class="eye-icon"
+        src="{{confirmPasswordVisible ? '../images/眼睛开.png' : '../images/眼睛-闭.png'}}"
+        mode="aspectFit"
+        bindtap="onToggleConfirmPasswordVisible"
       />
       <text class="field-icon" wx:if="{{confirmPasswordValid}}">✓</text>
     </view>

@@ -33,7 +33,21 @@ Page({
     passwordValid: false,
     confirmPasswordValid: false,
     canSubmit: false,
-    submitting: false
+    submitting: false,
+    // 7/1 新增: 密码可见性状态
+    passwordVisible: false,
+    confirmPasswordVisible: false
+  },
+
+  /**
+   * 7/1 新增: 切换密码显示/隐藏
+   */
+  onTogglePasswordVisible() {
+    this.setData({ passwordVisible: !this.data.passwordVisible });
+  },
+
+  onToggleConfirmPasswordVisible() {
+    this.setData({ confirmPasswordVisible: !this.data.confirmPasswordVisible });
   },
 
   // ========== 实时校验 ==========

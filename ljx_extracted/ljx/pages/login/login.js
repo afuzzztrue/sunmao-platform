@@ -19,7 +19,16 @@ Page({
     canSubmit: false,
     submitting: false,
     // 记录账号类型: phone / email
-    accountType: ''
+    accountType: '',
+    // 7/1 新增: 密码是否明文显示
+    passwordVisible: false
+  },
+
+  /**
+   * 7/1 新增: 切换密码显示/隐藏
+   */
+  onTogglePasswordVisible() {
+    this.setData({ passwordVisible: !this.data.passwordVisible });
   },
 
   onAccountInput(e) {
